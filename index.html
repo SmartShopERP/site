@@ -14,38 +14,32 @@
     
     <style>
         :root {
-            --sidebar-bg: #1c2437;
-            --sidebar-hover: #2a3449;
-            --main-bg: #f4f5f8;
-            --card-bg: #ffffff;
-            --primary-blue: #1a73e8;
-            --primary-red: #ef4444;
-            --success-green: #10b981;
-            --text-dark: #1f2937;
-            --text-gray: #6b7280;
-            --border-light: #e5e7eb;
-            --radius: 8px;
+            --sidebar-bg: #1c2437; --sidebar-hover: #2a3449;
+            --main-bg: #f4f5f8; --card-bg: #ffffff;
+            --primary-blue: #1a73e8; --primary-red: #ef4444; --success-green: #10b981;
+            --text-dark: #1f2937; --text-gray: #6b7280;
+            --border-light: #e5e7eb; --radius: 8px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background: var(--main-bg); color: var(--text-dark); height: 100vh; overflow: hidden; display: flex; }
 
-        /* Helpers */
         .hidden { display: none !important; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .grid-dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         .grid-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
-        input, select, textarea { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid var(--border-light); border-radius: 4px; outline: none; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid var(--border-light); border-radius: 4px; outline: none; font-size: 14px; background: #fff; }
         input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); }
+        input[readonly] { background: #f3f4f6; cursor: not-allowed; }
         
-        button { padding: 10px 16px; border: none; border-radius: 20px; font-weight: 500; font-size: 14px; cursor: pointer; color: #fff; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        button { padding: 10px 16px; border: none; border-radius: 20px; font-weight: 500; font-size: 14px; cursor: pointer; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
         button:hover { opacity: 0.9; }
         .btn-red { background: var(--primary-red); }
         .btn-blue { background: var(--primary-blue); }
+        .btn-green { background: var(--success-green); }
         .btn-outline { background: transparent; color: var(--primary-blue); border: 1px solid var(--primary-blue); }
 
-        /* Layouts */
         .page { width: 100%; height: 100%; display: none; }
         .active-page { display: flex; }
 
@@ -56,46 +50,36 @@
         /* Dashboard Screen */
         #pg-dash { flex-direction: row; width: 100%; }
         
-        /* Sidebar (Vyapar Style) */
         .sidebar { width: 240px; background: var(--sidebar-bg); color: #fff; display: flex; flex-direction: column; z-index: 10; }
         .brand { padding: 15px 20px; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .brand img { width: 24px; border-radius: 4px; }
         .nav-list { padding: 10px 0; overflow-y: auto; flex: 1; }
         .nav-btn { width: 100%; background: transparent; color: #d1d5db; text-align: left; padding: 12px 20px; border-radius: 0; font-weight: 400; font-size: 14px; justify-content: flex-start; gap: 12px; }
         .nav-btn i { width: 20px; text-align: center; }
-        .nav-btn:hover { background: var(--sidebar-hover); color: #fff; }
-        .nav-btn.active { background: var(--sidebar-hover); color: #fff; border-left: 4px solid var(--primary-red); }
+        .nav-btn:hover, .nav-btn.active { background: var(--sidebar-hover); color: #fff; border-left: 4px solid var(--primary-red); }
 
-        /* Main Content */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        
-        /* Top Header */
-        .header { background: #fff; padding: 12px 25px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .search-bar { display: flex; align-items: center; background: var(--main-bg); padding: 8px 15px; border-radius: 20px; width: 300px; color: var(--text-gray); }
-        .search-bar input { border: none; background: transparent; margin: 0; padding: 0 10px; width: 100%; }
-        .header-actions { display: flex; gap: 10px; }
-
-        /* Content Area */
+        .header { background: #fff; padding: 12px 25px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
         .content-area { padding: 25px; display: none; }
         .content-area.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Dashboard Cards */
+        /* Cards & Tables */
         .card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: var(--text-gray); font-size: 14px; font-weight: 500; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: var(--text-gray); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         .amount { font-size: 24px; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
-        .growth { color: var(--success-green); font-size: 12px; display: flex; align-items: center; gap: 4px; }
         
-        /* Tables */
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid var(--border-light); }
-        th { color: var(--text-gray); font-weight: 500; background: #f9fafb; }
+        th { color: var(--text-gray); font-weight: 600; background: #f9fafb; }
         tr:hover td { background: #f9fafb; }
 
-        /* Graph Dummy Line */
-        .graph-line { margin-top: 20px; height: 60px; border-bottom: 2px solid var(--success-green); position: relative; }
-        .graph-peak { position: absolute; bottom: 0; right: 20%; width: 2px; height: 50px; background: var(--success-green); }
-        .graph-peak::after { content: ''; position: absolute; top: -5px; left: -4px; width: 10px; height: 10px; background: #fff; border: 2px solid var(--success-green); border-radius: 50%; }
+        /* Custom Checkbox */
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; user-select: none; margin-bottom: 10px; color: var(--text-dark); }
+        .checkbox-wrapper input[type="checkbox"] { width: 16px; height: 16px; margin: 0; cursor: pointer; accent-color: var(--success-green); }
+
+        .balance-indicator { font-size: 12px; font-weight: 600; margin-top: -5px; margin-bottom: 15px; display: block; }
+        .bal-red { color: var(--primary-red); }
+        .bal-green { color: var(--success-green); }
 
         /* Toasts */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
@@ -112,12 +96,10 @@
     <div id="pg-auth" class="page active-page">
         <div class="auth-box">
             <h2 style="color:var(--text-dark); margin-bottom:5px;">SmartShop <span style="color:var(--primary-red)">ERP</span></h2>
-            <p style="color:var(--text-gray); font-size:13px; margin-bottom:25px;">Vyapar Style Edition</p>
-            
-            <input type="email" id="email" placeholder="Admin Email">
+            <p style="color:var(--text-gray); font-size:13px; margin-bottom:25px;">Professional Access Portal</p>
+            <input type="email" id="email" placeholder="Administrator Email">
             <input type="password" id="pass" placeholder="Password">
-            
-            <button class="btn-blue" style="width:100%; justify-content:center; border-radius:4px;" onclick="login()">Login to Dashboard</button>
+            <button class="btn-blue" style="width:100%; border-radius:4px;" onclick="login()">Authenticate securely</button>
         </div>
     </div>
 
@@ -125,30 +107,25 @@
         
         <div class="sidebar">
             <div class="brand">
-                <div style="background:var(--primary-red); color:#fff; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px; font-size:14px;"><i class="fa-solid fa-store"></i></div>
+                <div style="background:var(--primary-red); color:#fff; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-store"></i></div>
                 SmartStore
             </div>
             <div class="nav-list">
-                <button class="nav-btn active" onclick="switchTab('tab-home')"><i class="fa-solid fa-house"></i> Home</button>
-                <button class="nav-btn" onclick="switchTab('tab-parties')"><i class="fa-solid fa-users"></i> Parties</button>
-                <button class="nav-btn" onclick="switchTab('tab-items')"><i class="fa-solid fa-box"></i> Items</button>
-                <button class="nav-btn" onclick="switchTab('tab-sale')"><i class="fa-solid fa-file-invoice-dollar"></i> Sale</button>
-                <button class="nav-btn" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-cart-arrow-down"></i> Purchase</button>
-                <button class="nav-btn"><i class="fa-solid fa-wallet"></i> Cash & Bank</button>
-                <button class="nav-btn" style="color:var(--primary-red);" onclick="auth.signOut()"><i class="fa-solid fa-power-off"></i> Logout</button>
+                <button class="nav-btn active" onclick="switchTab('tab-home')"><i class="fa-solid fa-chart-pie"></i> Overview</button>
+                <button class="nav-btn" onclick="switchTab('tab-parties')"><i class="fa-solid fa-building-user"></i> Parties & Ledgers</button>
+                <button class="nav-btn" onclick="switchTab('tab-items')"><i class="fa-solid fa-boxes-stacked"></i> Inventory</button>
+                <button class="nav-btn" onclick="switchTab('tab-sale')"><i class="fa-solid fa-file-invoice-dollar"></i> Sales Invoice</button>
+                <button class="nav-btn" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-truck-ramp-box"></i> Purchase Bill</button>
+                <button class="nav-btn" style="color:var(--primary-red);" onclick="auth.signOut()"><i class="fa-solid fa-power-off"></i> Sign Out</button>
             </div>
         </div>
 
         <div class="main-content">
             <div class="header">
-                <div class="search-bar">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Search Transactions">
-                </div>
-                <div class="header-actions">
-                    <button class="btn-red" onclick="switchTab('tab-sale')"><i class="fa-solid fa-plus-circle"></i> Add Sale</button>
-                    <button class="btn-blue" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-plus-circle"></i> Add Purchase</button>
-                    <button class="btn-outline"><i class="fa-solid fa-plus-circle"></i> Add More</button>
+                <h3 style="font-size: 16px; color: var(--text-dark); font-weight: 600;" id="top-title">Business Overview</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-red" onclick="switchTab('tab-sale')" style="border-radius:4px;"><i class="fa-solid fa-plus"></i> New Sale</button>
+                    <button class="btn-blue" onclick="switchTab('tab-purchase')" style="border-radius:4px;"><i class="fa-solid fa-plus"></i> New Purchase</button>
                 </div>
             </div>
 
@@ -157,48 +134,42 @@
                     <div>
                         <div class="grid-cards">
                             <div class="card" style="grid-column: span 2;">
-                                <div class="card-header">
-                                    <span><i class="fa-solid fa-file-invoice-dollar" style="color:#f59e0b;"></i> Sale</span>
-                                    <select style="width:auto; padding:4px; margin:0; border:none; background:#f3f4f6;"><option>This Month</option></select>
-                                </div>
-                                <div class="amount">₹ <span id="dash-total-sale">0</span></div>
-                                <div class="growth"><i class="fa-solid fa-arrow-up"></i> Total Sale</div>
-                                <div class="graph-line"><div class="graph-peak"></div></div>
+                                <div class="card-header"><span><i class="fa-solid fa-chart-line" style="color:var(--primary-blue);"></i> Total Sales Revenue</span></div>
+                                <div class="amount">₹ <span id="dash-total-sale">0.00</span></div>
                             </div>
                             
                             <div class="card">
-                                <div class="card-header"><span style="color:var(--success-green);"><i class="fa-solid fa-arrow-down"></i> You'll Receive</span></div>
-                                <div class="amount">₹ <span id="dash-receive">0</span></div>
-                                <div style="color:var(--text-gray); font-size:11px; margin-top:20px;">Udhaar Lena Hai</div>
+                                <div class="card-header"><span style="color:var(--success-green);"><i class="fa-solid fa-arrow-down"></i> Accounts Receivable</span></div>
+                                <div class="amount">₹ <span id="dash-receive">0.00</span></div>
+                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">To be collected from customers</div>
                             </div>
 
                             <div class="card">
-                                <div class="card-header"><span style="color:var(--primary-red);"><i class="fa-solid fa-arrow-up"></i> You'll Pay</span></div>
-                                <div class="amount">₹ <span id="dash-pay">0</span></div>
-                                <div style="color:var(--text-gray); font-size:11px; margin-top:20px;">Udhaar Dena Hai</div>
+                                <div class="card-header"><span style="color:var(--primary-red);"><i class="fa-solid fa-arrow-up"></i> Accounts Payable</span></div>
+                                <div class="amount">₹ <span id="dash-pay">0.00</span></div>
+                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">To be paid to suppliers</div>
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <div class="card" style="padding:15px;">
-                            <div class="card-header" style="margin-bottom:10px;">Stock Inventory</div>
+                            <div class="card-header" style="margin-bottom:10px;">Stock Valuation</div>
                             <div style="padding:10px 0; border-bottom:1px solid var(--border-light);">
-                                <div style="color:var(--text-gray); font-size:12px;">Stock Value</div>
-                                <div style="font-size:16px; font-weight:600;">₹ <span id="dash-stock-value">0</span></div>
+                                <div style="color:var(--text-gray); font-size:12px;">Estimated Value</div>
+                                <div style="font-size:16px; font-weight:600;">₹ <span id="dash-stock-value">0.00</span></div>
                             </div>
-                            <div style="padding:10px 0;">
-                                <div style="color:var(--text-gray); font-size:12px; display:flex; justify-content:space-between;">
-                                    Low Stocks <span style="color:var(--primary-red);" id="dash-low-stock">0</span>
-                                </div>
+                            <div style="padding:10px 0; display:flex; justify-content:space-between; font-size:12px;">
+                                <span color="var(--text-gray)">Low Stock Alerts</span>
+                                <span style="color:var(--primary-red); font-weight:bold;" id="dash-low-stock">0 Items</span>
                             </div>
                         </div>
 
                         <div class="card" style="padding:15px;">
-                            <div class="card-header" style="margin-bottom:10px;">Cash & Bank</div>
-                            <div style="padding:10px 0; border-bottom:1px solid var(--border-light);">
-                                <div style="color:var(--text-gray); font-size:12px;">Cash in hand</div>
-                                <div style="font-size:16px; font-weight:600; color:var(--success-green);">₹ <span id="dash-cash">0</span></div>
+                            <div class="card-header" style="margin-bottom:10px;">Liquid Assets</div>
+                            <div style="padding:10px 0;">
+                                <div style="color:var(--text-gray); font-size:12px;">Cash in Hand</div>
+                                <div style="font-size:16px; font-weight:600; color:var(--success-green);">₹ <span id="dash-cash">0.00</span></div>
                             </div>
                         </div>
                     </div>
@@ -208,32 +179,32 @@
             <div id="tab-parties" class="content-area">
                 <div class="grid-dashboard">
                     <div class="card">
-                        <div class="card-header" style="color:var(--primary-blue);">Add New Party (Customer/Supplier)</div>
-                        <input type="text" id="partyName" placeholder="Party Name (e.g. Rahul)">
+                        <div class="card-header" style="color:var(--primary-blue);">Register New Party</div>
+                        <input type="text" id="partyName" placeholder="Full Name / Company Name">
                         <div class="grid-2">
-                            <input type="number" id="partyPhone" placeholder="WhatsApp Number (e.g. 69698989)">
+                            <input type="number" id="partyPhone" placeholder="Contact Number">
                             <select id="partyType">
-                                <option value="customer">Customer (Udhaar Lene Wala)</option>
-                                <option value="supplier">Supplier (Maal Dene Wala)</option>
+                                <option value="customer">Customer (Receivable)</option>
+                                <option value="supplier">Supplier (Payable)</option>
                             </select>
                         </div>
-                        <textarea id="partyAddress" rows="2" placeholder="Address (e.g. Mumbai Film City West 400002)"></textarea>
+                        <textarea id="partyAddress" rows="2" placeholder="Registered Address"></textarea>
                         
                         <div class="grid-2">
                             <input type="number" id="partyBalance" placeholder="Opening Balance (₹)" value="0">
                             <select id="balanceType">
-                                <option value="receive">To Receive (Lena Hai)</option>
-                                <option value="pay">To Pay (Dena Hai)</option>
+                                <option value="receive">To Receive (Debit)</option>
+                                <option value="pay">To Pay (Credit)</option>
                             </select>
                         </div>
-                        <button class="btn-blue" style="border-radius:4px; width:100%; justify-content:center;" onclick="saveParty()">Save Party</button>
+                        <button class="btn-blue" style="border-radius:4px; width:100%;" onclick="saveParty()"><i class="fa-solid fa-save"></i> Save Party Details</button>
                     </div>
 
                     <div class="card">
-                        <div class="card-header">Party List</div>
-                        <div style="max-height:300px; overflow-y:auto;">
+                        <div class="card-header">Party Directory & Ledgers</div>
+                        <div style="max-height:350px; overflow-y:auto;">
                             <table>
-                                <thead><tr><th>Name</th><th>Balance</th></tr></thead>
+                                <thead><tr><th>Party Info</th><th>Category</th><th>Net Balance</th></tr></thead>
                                 <tbody id="party-table-body"></tbody>
                             </table>
                         </div>
@@ -242,63 +213,108 @@
             </div>
 
             <div id="tab-items" class="content-area">
-                <div class="card">
-                    <div class="card-header" style="color:var(--primary-blue);">Add New Item / Update Stock</div>
+                <div class="card" style="max-width:600px;">
+                    <div class="card-header" style="color:var(--primary-blue);">Master Inventory Setup</div>
                     <div class="grid-2">
-                        <input type="text" id="itemName" placeholder="Item Name">
-                        <input type="number" id="itemStock" placeholder="Opening Stock Qty" value="0">
+                        <input type="text" id="itemName" placeholder="Product Name / Description">
+                        <input type="number" id="itemStock" placeholder="Initial Stock Quantity" value="0">
                     </div>
                     <div class="grid-2">
-                        <input type="number" id="itemPurchase" placeholder="Purchase Price (₹)">
-                        <input type="number" id="itemSale" placeholder="Sale Price (₹)">
+                        <input type="number" id="itemPurchase" placeholder="Purchase Cost (₹)">
+                        <input type="number" id="itemSale" placeholder="Selling Price (₹)">
                     </div>
-                    <button class="btn-blue" style="border-radius:4px;" onclick="saveItem()">Save Item</button>
+                    <button class="btn-blue" style="border-radius:4px;" onclick="saveItem()"><i class="fa-solid fa-save"></i> Save to Inventory</button>
                 </div>
                 
                 <div class="card">
+                    <div class="card-header">Current Stock Status</div>
                     <table>
-                        <thead><tr><th>Item Name</th><th>Stock</th><th>Purchase Price</th><th>Sale Price</th></tr></thead>
+                        <thead><tr><th>Product Name</th><th>Available Stock</th><th>Cost Price</th><th>Selling Price</th></tr></thead>
                         <tbody id="item-table-body"></tbody>
                     </table>
                 </div>
-            </div>
-            
-            <div id="tab-purchase" class="content-area">
-                <div class="card"><h3 style="text-align:center; padding:40px;">Please use the 'Items' tab to add Purchase Stock for now.</h3></div>
             </div>
 
             <div id="tab-sale" class="content-area">
                 <div class="grid-dashboard">
                     <div class="card">
-                        <div class="card-header">Billing Details</div>
-                        <select id="posParty"><option value="">-- Select Party / Cash Sale --</option></select>
+                        <div class="card-header">Create Sales Invoice</div>
+                        <select id="posParty"><option value="">-- Cash Sale (No Party Selected) --</option></select>
                         
                         <div style="margin-top:20px; border-top:1px solid var(--border-light); padding-top:15px;">
-                            <select id="posItem"><option value="">-- Select Item --</option></select>
+                            <select id="posItem"><option value="">-- Select Product from Inventory --</option></select>
                             <div class="grid-2">
-                                <input type="number" id="posQty" placeholder="Qty" value="1">
-                                <input type="number" id="posPrice" placeholder="Price (₹)">
+                                <input type="number" id="posQty" placeholder="Quantity" value="1">
+                                <input type="number" id="posPrice" placeholder="Unit Price (₹)">
                             </div>
-                            <button class="btn-outline" style="width:100%; justify-content:center; border-radius:4px;" onclick="addPosItem()">+ Add to Bill</button>
+                            <button class="btn-outline" style="width:100%; border-radius:4px;" onclick="addPosItem('sale')">+ Add Line Item</button>
                         </div>
                     </div>
 
                     <div class="card">
                         <div class="card-header">Invoice Summary</div>
-                        <div id="pos-cart" style="min-height:150px; margin-bottom:15px; font-size:13px;">
-                            <div style="text-align:center; color:var(--text-gray); margin-top:20px;">No items added</div>
+                        <div id="pos-cart" style="min-height:120px; margin-bottom:15px; font-size:13px; border:1px solid var(--border-light); border-radius:4px; padding:10px;">
+                            <div style="text-align:center; color:var(--text-gray); margin-top:20px;">Cart is empty</div>
                         </div>
-                        <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:600; border-top:1px solid var(--border-light); padding-top:15px;">
-                            <span>Total</span>
+                        
+                        <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:600; padding:10px 0;">
+                            <span>Grand Total</span>
                             <span style="color:var(--success-green);">₹<span id="pos-total">0</span></span>
                         </div>
                         
-                        <div style="margin-top:15px;">
-                            <label style="font-size:12px; color:var(--text-gray);">Amount Received (Cash)</label>
-                            <input type="number" id="posReceived" placeholder="Amount Received" value="0">
+                        <div style="background:#f9fafb; padding:15px; border-radius:4px; margin-top:10px; border:1px solid var(--border-light);">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="saleFullPaid" onchange="toggleFullPay('sale')"> Mark as Fully Paid
+                            </label>
+                            
+                            <label style="font-size:12px; color:var(--text-gray); font-weight:500;">Amount Received (₹)</label>
+                            <input type="number" id="posReceived" placeholder="0.00" value="0" onkeyup="calcBalance('sale')" style="margin-bottom:5px;">
+                            <span id="saleBalanceDue" class="balance-indicator bal-red">Balance Due: ₹0</span>
                         </div>
 
-                        <button class="btn-red" style="width:100%; justify-content:center; border-radius:4px; margin-top:10px;" onclick="checkoutSale()">Save & Send Bill</button>
+                        <button class="btn-red" style="width:100%; border-radius:4px; margin-top:15px; padding:14px;" onclick="checkoutSale()">Generate Invoice & Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-purchase" class="content-area">
+                <div class="grid-dashboard">
+                    <div class="card">
+                        <div class="card-header">Record Purchase Bill</div>
+                        <select id="purParty"><option value="">-- Cash Purchase (No Supplier Selected) --</option></select>
+                        
+                        <div style="margin-top:20px; border-top:1px solid var(--border-light); padding-top:15px;">
+                            <select id="purItem"><option value="">-- Select Product --</option></select>
+                            <div class="grid-2">
+                                <input type="number" id="purQty" placeholder="Quantity" value="1">
+                                <input type="number" id="purPrice" placeholder="Purchase Cost (₹)">
+                            </div>
+                            <button class="btn-outline" style="width:100%; border-radius:4px;" onclick="addPosItem('purchase')">+ Add to Bill</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Bill Summary</div>
+                        <div id="pur-cart" style="min-height:120px; margin-bottom:15px; font-size:13px; border:1px solid var(--border-light); border-radius:4px; padding:10px;">
+                            <div style="text-align:center; color:var(--text-gray); margin-top:20px;">Bill is empty</div>
+                        </div>
+                        
+                        <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:600; padding:10px 0;">
+                            <span>Grand Total</span>
+                            <span style="color:var(--primary-red);">₹<span id="pur-total">0</span></span>
+                        </div>
+                        
+                        <div style="background:#f9fafb; padding:15px; border-radius:4px; margin-top:10px; border:1px solid var(--border-light);">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" id="purFullPaid" onchange="toggleFullPay('purchase')"> Mark as Fully Paid
+                            </label>
+                            
+                            <label style="font-size:12px; color:var(--text-gray); font-weight:500;">Amount Paid to Supplier (₹)</label>
+                            <input type="number" id="purPaid" placeholder="0.00" value="0" onkeyup="calcBalance('purchase')" style="margin-bottom:5px;">
+                            <span id="purBalanceDue" class="balance-indicator bal-red">Balance Pending: ₹0</span>
+                        </div>
+
+                        <button class="btn-blue" style="width:100%; border-radius:4px; margin-top:15px; padding:14px;" onclick="checkoutPurchase()">Save Purchase & Update Stock</button>
                     </div>
                 </div>
             </div>
@@ -324,13 +340,10 @@
     const db = firebase.database();
     
     let uid = null;
-    let partiesData = {};
-    let itemsData = {};
-    let cart = [];
-    let cashInHand = 0;
-    let totalSalesAmt = 0;
+    let partiesData = {}; let itemsData = {}; 
+    let saleCart = []; let purchaseCart = [];
+    let cashInHand = 0; let totalSalesAmt = 0;
 
-    // Toast System
     function showToast(msg, type='success') {
         const t = document.createElement('div');
         t.className = `toast ${type}`;
@@ -339,7 +352,6 @@
         setTimeout(() => t.remove(), 3000);
     }
 
-    // Auth state
     auth.onAuthStateChanged(user => {
         if(user){
             uid = user.uid;
@@ -355,7 +367,7 @@
 
     function login() {
         const e = document.getElementById('email').value.trim(), p = document.getElementById('pass').value;
-        if(!e || !p) return showToast("Enter credentials", "error");
+        if(!e || !p) return showToast("Credentials required", "error");
         auth.signInWithEmailAndPassword(e, p).catch(err => {
             if(err.code === 'auth/user-not-found') auth.createUserWithEmailAndPassword(e, p);
             else showToast(err.message, "error");
@@ -367,174 +379,231 @@
         document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
+        
+        const titles = {'tab-home':'Business Overview', 'tab-parties':'Party Management', 'tab-items':'Inventory Management', 'tab-sale':'Sales Invoice', 'tab-purchase':'Purchase Bill'};
+        document.getElementById('top-title').innerText = titles[tabId];
     }
 
-    // Data Fetching & Dashboard Sync
+    // --- FETCH DATA ---
     function fetchData() {
-        // Fetch Parties
         db.ref(`users/${uid}/parties`).on('value', snap => {
             partiesData = snap.val() || {};
             let ptBody = document.getElementById('party-table-body');
-            let posParty = document.getElementById('posParty');
-            ptBody.innerHTML = ''; posParty.innerHTML = '<option value="">-- Cash Sale --</option>';
+            let posParty = document.getElementById('posParty'); let purParty = document.getElementById('purParty');
+            
+            ptBody.innerHTML = ''; 
+            posParty.innerHTML = '<option value="">-- Cash Sale (No Party) --</option>';
+            purParty.innerHTML = '<option value="">-- Cash Purchase (No Party) --</option>';
             
             let receive = 0, pay = 0;
             for(let key in partiesData) {
                 let p = partiesData[key];
                 let color = p.balance > 0 ? 'var(--success-green)' : (p.balance < 0 ? 'var(--primary-red)' : 'var(--text-dark)');
-                ptBody.innerHTML += `<tr><td>${p.name} <br><small style="color:var(--text-gray)">${p.phone}</small></td><td style="color:${color}; font-weight:600;">₹${Math.abs(p.balance)} ${p.balance>0?'(Dr)':'(Cr)'}</td></tr>`;
-                posParty.innerHTML += `<option value="${key}">${p.name} - ${p.phone}</option>`;
+                ptBody.innerHTML += `<tr><td><strong>${p.name}</strong> <br><small style="color:var(--text-gray)"><i class="fa-solid fa-phone"></i> ${p.phone}</small></td><td style="text-transform:capitalize;">${p.type}</td><td style="color:${color}; font-weight:600;">₹${Math.abs(p.balance).toFixed(2)} ${p.balance>0?'(Recv)':'(Pay)'}</td></tr>`;
+                
+                if(p.type === 'customer') posParty.innerHTML += `<option value="${key}">${p.name} - ${p.phone}</option>`;
+                if(p.type === 'supplier') purParty.innerHTML += `<option value="${key}">${p.name} - ${p.phone}</option>`;
                 
                 if(p.balance > 0) receive += p.balance;
                 if(p.balance < 0) pay += Math.abs(p.balance);
             }
-            document.getElementById('dash-receive').innerText = receive;
-            document.getElementById('dash-pay').innerText = pay;
+            document.getElementById('dash-receive').innerText = receive.toFixed(2);
+            document.getElementById('dash-pay').innerText = pay.toFixed(2);
         });
 
-        // Fetch Items
         db.ref(`users/${uid}/items`).on('value', snap => {
             itemsData = snap.val() || {};
             let itBody = document.getElementById('item-table-body');
-            let posItem = document.getElementById('posItem');
-            itBody.innerHTML = ''; posItem.innerHTML = '<option value="">-- Select Item --</option>';
+            let posItem = document.getElementById('posItem'); let purItem = document.getElementById('purItem');
+            itBody.innerHTML = ''; 
+            posItem.innerHTML = '<option value="">-- Select Product --</option>'; purItem.innerHTML = '<option value="">-- Select Product --</option>';
             
             let stockVal = 0, lowStock = 0;
             for(let key in itemsData) {
                 let i = itemsData[key];
-                itBody.innerHTML += `<tr><td>${i.name}</td><td>${i.stock}</td><td>₹${i.purchasePrice}</td><td>₹${i.salePrice}</td></tr>`;
-                posItem.innerHTML += `<option value="${key}">${i.name} (Qty: ${i.stock})</option>`;
-                
+                itBody.innerHTML += `<tr><td><strong>${i.name}</strong></td><td>${i.stock}</td><td>₹${i.purchasePrice}</td><td>₹${i.salePrice}</td></tr>`;
+                posItem.innerHTML += `<option value="${key}">${i.name} (In Stock: ${i.stock})</option>`;
+                purItem.innerHTML += `<option value="${key}">${i.name} (In Stock: ${i.stock})</option>`;
                 stockVal += (i.stock * i.purchasePrice);
                 if(i.stock <= 5) lowStock++;
             }
-            document.getElementById('dash-stock-value').innerText = stockVal;
-            document.getElementById('dash-low-stock').innerText = lowStock;
+            document.getElementById('dash-stock-value').innerText = stockVal.toFixed(2);
+            document.getElementById('dash-low-stock').innerText = `${lowStock} Items`;
         });
 
-        // Fetch Sales & Cash
         db.ref(`users/${uid}/sales`).on('value', snap => {
             let sales = snap.val() || {};
             totalSalesAmt = 0; cashInHand = 0;
-            for(let key in sales) {
-                totalSalesAmt += sales[key].total;
-                cashInHand += sales[key].received;
-            }
-            document.getElementById('dash-total-sale').innerText = totalSalesAmt;
-            document.getElementById('dash-cash').innerText = cashInHand;
+            for(let key in sales) { totalSalesAmt += sales[key].total; cashInHand += sales[key].received; }
+            document.getElementById('dash-total-sale').innerText = totalSalesAmt.toFixed(2);
+            document.getElementById('dash-cash').innerText = cashInHand.toFixed(2);
         });
     }
 
-    // Party Logic
+    // --- MASTERS LOGIC ---
     function saveParty() {
-        const name = document.getElementById('partyName').value.trim();
-        const phone = document.getElementById('partyPhone').value.trim();
-        const address = document.getElementById('partyAddress').value.trim();
-        const type = document.getElementById('partyType').value;
+        const name = document.getElementById('partyName').value.trim(), phone = document.getElementById('partyPhone').value.trim();
+        const address = document.getElementById('partyAddress').value.trim(), type = document.getElementById('partyType').value;
         let bal = parseFloat(document.getElementById('partyBalance').value) || 0;
-        const balType = document.getElementById('balanceType').value;
-
         if(!name) return showToast("Party Name required", "error");
-        
-        // Agar paise lene hain (Receive) to positive, dene hain (Pay) to negative
-        if(balType === 'pay') bal = -Math.abs(bal);
+        if(document.getElementById('balanceType').value === 'pay') bal = -Math.abs(bal); // Negative for payable
 
-        const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now();
+        const key = "PRT_" + Date.now();
         db.ref(`users/${uid}/parties/${key}`).set({ name, phone, address, type, balance: bal }).then(()=>{
-            showToast("Party Saved!");
-            document.getElementById('partyName').value = ''; document.getElementById('partyPhone').value = '';
-            document.getElementById('partyAddress').value = ''; document.getElementById('partyBalance').value = '0';
+            showToast("Party Profile Created!");
+            ['partyName','partyPhone','partyAddress'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('partyBalance').value = '0';
         });
     }
 
-    // Item Logic
     function saveItem() {
         const name = document.getElementById('itemName').value.trim();
         const stock = parseInt(document.getElementById('itemStock').value) || 0;
         const pPrice = parseFloat(document.getElementById('itemPurchase').value) || 0;
         const sPrice = parseFloat(document.getElementById('itemSale').value) || 0;
-
         if(!name) return showToast("Item Name required", "error");
 
-        const key = name.toLowerCase().replace(/[^a-z0-9]/g, '_');
-        let currentStock = itemsData[key] ? itemsData[key].stock : 0;
-
-        db.ref(`users/${uid}/items/${key}`).set({ name, stock: currentStock + stock, purchasePrice: pPrice, salePrice: sPrice }).then(()=>{
-            showToast("Item Saved!");
-            document.getElementById('itemName').value = ''; document.getElementById('itemStock').value = '0';
-            document.getElementById('itemPurchase').value = ''; document.getElementById('itemSale').value = '';
+        const key = "ITM_" + Date.now();
+        db.ref(`users/${uid}/items/${key}`).set({ name, stock, purchasePrice: pPrice, salePrice: sPrice }).then(()=>{
+            showToast("Inventory Updated!");
+            ['itemName','itemPurchase','itemSale'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('itemStock').value = '0';
         });
     }
 
-    document.getElementById('posItem').addEventListener('change', e => {
-        let key = e.target.value;
-        document.getElementById('posPrice').value = key ? itemsData[key].salePrice : '';
-    });
+    // Auto-fill prices
+    document.getElementById('posItem').addEventListener('change', e => document.getElementById('posPrice').value = e.target.value ? itemsData[e.target.value].salePrice : '');
+    document.getElementById('purItem').addEventListener('change', e => document.getElementById('purPrice').value = e.target.value ? itemsData[e.target.value].purchasePrice : '');
 
-    // POS Logic
-    function addPosItem() {
-        const key = document.getElementById('posItem').value;
-        const qty = parseInt(document.getElementById('posQty').value);
-        const price = parseFloat(document.getElementById('posPrice').value);
-        if(!key || !qty || !price) return showToast("Select item & details", "error");
-        if(itemsData[key].stock < qty) return showToast("Low Stock!", "error");
-
-        cart.push({ key, name: itemsData[key].name, qty, price, total: qty*price });
-        updateCart();
-        document.getElementById('posItem').value = ''; document.getElementById('posQty').value = '1';
+    // --- BILLING LOGIC (SALE & PURCHASE) ---
+    function toggleFullPay(type) {
+        const isChecked = document.getElementById(`${type}FullPaid`).checked;
+        const total = parseInt(document.getElementById(`${type === 'sale' ? 'pos' : 'pur'}-total`).innerText);
+        const inputField = document.getElementById(type === 'sale' ? 'posReceived' : 'purPaid');
+        
+        if(isChecked) {
+            inputField.value = total;
+            inputField.setAttribute('readonly', true);
+        } else {
+            inputField.removeAttribute('readonly');
+        }
+        calcBalance(type);
     }
 
-    function updateCart() {
-        let c = document.getElementById('pos-cart'), t = 0;
-        if(cart.length===0){ c.innerHTML = '<div style="text-align:center; color:var(--text-gray); margin-top:20px;">No items</div>'; document.getElementById('pos-total').innerText="0"; document.getElementById('posReceived').value="0"; return; }
+    function calcBalance(type) {
+        const total = parseInt(document.getElementById(`${type === 'sale' ? 'pos' : 'pur'}-total`).innerText) || 0;
+        const paid = parseInt(document.getElementById(type === 'sale' ? 'posReceived' : 'purPaid').value) || 0;
+        const balLabel = document.getElementById(`${type}BalanceDue`);
+        const diff = total - paid;
+        
+        balLabel.innerText = `Balance Due: ₹${diff}`;
+        balLabel.className = `balance-indicator ${diff > 0 ? 'bal-red' : 'bal-green'}`;
+    }
+
+    function addPosItem(type) {
+        const isSale = type === 'sale';
+        const key = document.getElementById(isSale ? 'posItem' : 'purItem').value;
+        const qty = parseInt(document.getElementById(isSale ? 'posQty' : 'purQty').value);
+        const price = parseFloat(document.getElementById(isSale ? 'posPrice' : 'purPrice').value);
+        
+        if(!key || !qty || !price) return showToast("Invalid item details", "error");
+        if(isSale && itemsData[key].stock < qty) return showToast(`Low Stock! Only ${itemsData[key].stock} left.`, "error");
+
+        let targetCart = isSale ? saleCart : purchaseCart;
+        targetCart.push({ key, name: itemsData[key].name, qty, price, total: qty*price });
+        updateCart(type);
+        
+        document.getElementById(isSale ? 'posItem' : 'purItem').value = '';
+        document.getElementById(isSale ? 'posQty' : 'purQty').value = '1';
+    }
+
+    function updateCart(type) {
+        const isSale = type === 'sale';
+        const cartArr = isSale ? saleCart : purchaseCart;
+        const c = document.getElementById(isSale ? 'pos-cart' : 'pur-cart');
+        let t = 0;
+        
+        if(cartArr.length===0){ 
+            c.innerHTML = '<div style="text-align:center; color:var(--text-gray); margin-top:20px;">Cart is empty</div>'; 
+            document.getElementById(isSale ? 'pos-total' : 'pur-total').innerText="0"; 
+            calcBalance(type);
+            return; 
+        }
         
         c.innerHTML = '';
-        cart.forEach((i, idx) => {
+        cartArr.forEach((i, idx) => {
             t += i.total;
-            c.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #eee; padding-bottom:5px;">
-                <div>${i.name} <br><small style="color:var(--text-gray)">${i.qty} x ₹${i.price}</small></div>
-                <div style="text-align:right;">₹${i.total} <br><i class="fa-solid fa-trash" style="color:var(--primary-red); cursor:pointer; font-size:11px;" onclick="cart.splice(${idx},1);updateCart()"></i></div>
+            c.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #f3f4f6; padding-bottom:8px;">
+                <div><strong>${i.name}</strong> <br><small style="color:var(--text-gray)">${i.qty} units @ ₹${i.price}</small></div>
+                <div style="text-align:right; font-weight:600;">₹${i.total} <br><i class="fa-solid fa-trash" style="color:var(--primary-red); cursor:pointer; font-size:12px; margin-top:5px;" onclick="${isSale?'saleCart':'purchaseCart'}.splice(${idx},1);updateCart('${type}')"></i></div>
             </div>`;
         });
-        document.getElementById('pos-total').innerText = t;
-        document.getElementById('posReceived').value = t; // Auto fill received amount
+        document.getElementById(isSale ? 'pos-total' : 'pur-total').innerText = t;
+        
+        // Auto update input if 'Full Paid' is checked
+        if(document.getElementById(`${type}FullPaid`).checked) {
+            document.getElementById(isSale ? 'posReceived' : 'purPaid').value = t;
+        }
+        calcBalance(type);
     }
 
     async function checkoutSale() {
-        if(cart.length === 0) return showToast("Cart Empty", "error");
+        if(saleCart.length === 0) return showToast("Cart Empty", "error");
         const partyId = document.getElementById('posParty').value;
         const total = parseInt(document.getElementById('pos-total').innerText);
         const received = parseInt(document.getElementById('posReceived').value) || 0;
-        const billId = "SALE_" + Date.now();
-
-        let partyName = "Cash Sale", partyPhone = "";
+        const billId = "INV_" + Date.now();
+        let partyName = "Cash Customer", partyPhone = "";
         
         try {
-            // Save Sale
-            await db.ref(`users/${uid}/sales/${billId}`).set({ partyId, total, received, items: cart, date: new Date().toISOString() });
+            await db.ref(`users/${uid}/sales/${billId}`).set({ partyId, total, received, items: saleCart, date: new Date().toISOString() });
             
-            // Deduct Stock
-            for(let i of cart) await db.ref(`users/${uid}/items/${i.key}`).update({ stock: itemsData[i.key].stock - i.qty });
+            for(let i of saleCart) await db.ref(`users/${uid}/items/${i.key}`).update({ stock: itemsData[i.key].stock - i.qty });
 
-            // Update Party Ledger (If Udhaar)
             if(partyId) {
-                partyName = partiesData[partyId].name;
-                partyPhone = partiesData[partyId].phone;
-                let udhaar = total - received; // Agar bill 1000, diya 500 = 500 udhaar badhega
-                let newBal = partiesData[partyId].balance + udhaar;
-                await db.ref(`users/${uid}/parties/${partyId}`).update({ balance: newBal });
+                partyName = partiesData[partyId].name; partyPhone = partiesData[partyId].phone;
+                let pendingBal = total - received; // Udhaar
+                await db.ref(`users/${uid}/parties/${partyId}`).update({ balance: partiesData[partyId].balance + pendingBal });
             }
 
-            // Msg
-            let msg = `🧾 *${partyName} - INVOICE*\nTotal: Rs.${total}\nPaid: Rs.${received}\n`;
-            if(partyId) msg += `Balance: Rs.${total-received}\n`;
-            msg += `\nThank You!`;
+            let msg = `🧾 *${partyName.toUpperCase()} - TAX INVOICE*\nInv No: ${billId}\n\n`;
+            saleCart.forEach(i => { msg += `▪ ${i.name} (${i.qty}) = Rs.${i.total}\n`; });
+            msg += `\n*Total Amount: Rs.${total}*\n*Amount Paid: Rs.${received}*\n`;
+            if(total-received > 0) msg += `*Balance Due: Rs.${total-received}*\n`;
+            msg += `\nThank you for your business!`;
 
-            cart = []; updateCart(); document.getElementById('posParty').value='';
-            showToast("Sale Completed!");
-
+            saleCart = []; updateCart('sale'); document.getElementById('posParty').value='';
+            document.getElementById('saleFullPaid').checked = false; document.getElementById('posReceived').removeAttribute('readonly');
+            
+            showToast("Invoice Generated!");
             if(partyPhone) setTimeout(() => window.open(`https://wa.me/91${partyPhone}?text=${encodeURIComponent(msg)}`, '_blank'), 1000);
 
+        } catch(e) { showToast(e.message, "error"); }
+    }
+
+    async function checkoutPurchase() {
+        if(purchaseCart.length === 0) return showToast("Purchase Bill Empty", "error");
+        const partyId = document.getElementById('purParty').value;
+        const total = parseInt(document.getElementById('pur-total').innerText);
+        const paid = parseInt(document.getElementById('purPaid').value) || 0;
+        const billId = "PUR_" + Date.now();
+        
+        try {
+            await db.ref(`users/${uid}/purchases/${billId}`).set({ partyId, total, paid, items: purchaseCart, date: new Date().toISOString() });
+            
+            // Stock In (+)
+            for(let i of purchaseCart) await db.ref(`users/${uid}/items/${i.key}`).update({ stock: itemsData[i.key].stock + i.qty });
+
+            // Payable Ledger Update (Negative balance means we have to pay)
+            if(partyId) {
+                let pendingBal = total - paid; // Amount we owe
+                await db.ref(`users/${uid}/parties/${partyId}`).update({ balance: partiesData[partyId].balance - pendingBal });
+            }
+
+            purchaseCart = []; updateCart('purchase'); document.getElementById('purParty').value='';
+            document.getElementById('purFullPaid').checked = false; document.getElementById('purPaid').removeAttribute('readonly');
+            
+            showToast("Purchase Recorded & Stock Updated!");
         } catch(e) { showToast(e.message, "error"); }
     }
 </script>
