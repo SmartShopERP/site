@@ -92,6 +92,10 @@
         .checkbox-wrapper { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; user-select: none; margin-bottom: 10px; }
         .checkbox-wrapper input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary-blue); }
 
+        .balance-indicator { font-size: 12px; font-weight: 600; margin-top: -5px; margin-bottom: 15px; display: block; }
+        .bal-red { color: var(--primary-red); }
+        .bal-green { color: var(--success-green); }
+
         /* Toasts */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
         .toast { padding: 12px 20px; border-radius: 4px; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s forwards; }
@@ -110,11 +114,12 @@
             <p style="color:var(--text-gray); font-size:13px; margin-bottom:25px;">Professional Access Portal</p>
             <input type="email" id="email" placeholder="Administrator Email">
             <input type="password" id="pass" placeholder="Password">
-            <button class="btn-blue" style="width:100%; border-radius:4px;" onclick="login()">Authenticate securely</button>
+            <button class="btn-blue" style="width:100%; border-radius:4px;" onclick="login()">Authenticate Securely</button>
         </div>
     </div>
 
     <div id="pg-dash" class="page">
+        
         <div class="sidebar">
             <div class="brand">
                 <div style="background:var(--primary-red); color:#fff; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-store"></i></div>
@@ -134,8 +139,8 @@
             <div class="header">
                 <h3 style="font-size: 16px; color: var(--text-dark); font-weight: 600;" id="top-title">Business Overview</h3>
                 <div style="display: flex; gap: 10px;">
-                    <button class="btn-red" onclick="switchTab('tab-sale')"><i class="fa-solid fa-plus"></i> Add Sale</button>
-                    <button class="btn-blue" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-plus"></i> Add Purchase</button>
+                    <button class="btn-red" onclick="switchTab('tab-sale')" style="border-radius:4px;"><i class="fa-solid fa-plus"></i> New Sale</button>
+                    <button class="btn-blue" onclick="switchTab('tab-purchase')" style="border-radius:4px;"><i class="fa-solid fa-plus"></i> New Purchase</button>
                 </div>
             </div>
 
@@ -148,14 +153,14 @@
                                 <div class="amount">₹ <span id="dash-total-sale">0.00</span></div>
                             </div>
                             <div class="card">
-                                <div class="card-header"><span style="color:var(--success-green);"><i class="fa-solid fa-arrow-down"></i> To Receive</span></div>
+                                <div class="card-header"><span style="color:var(--success-green);"><i class="fa-solid fa-arrow-down"></i> Accounts Receivable</span></div>
                                 <div class="amount">₹ <span id="dash-receive">0.00</span></div>
-                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">Pending from parties</div>
+                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">Amount to collect from customers</div>
                             </div>
                             <div class="card">
-                                <div class="card-header"><span style="color:var(--primary-red);"><i class="fa-solid fa-arrow-up"></i> To Pay</span></div>
+                                <div class="card-header"><span style="color:var(--primary-red);"><i class="fa-solid fa-arrow-up"></i> Accounts Payable</span></div>
                                 <div class="amount">₹ <span id="dash-pay">0.00</span></div>
-                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">Pending to suppliers</div>
+                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">Amount to pay suppliers</div>
                             </div>
                         </div>
                     </div>
@@ -176,11 +181,11 @@
             <div id="tab-parties" class="content-area">
                 <div class="grid-dashboard">
                     <div class="card">
-                        <div class="card-header">Add New Party</div>
+                        <div class="card-header">Register New Party</div>
                         <label>Party Name *</label>
-                        <input type="text" id="partyName" placeholder="Enter Party Name">
+                        <input type="text" id="partyName" placeholder="Full Name / Company Name">
                         
-                        <label>Phone Number</label>
+                        <label>Contact Number</label>
                         <input type="number" id="partyPhone" placeholder="10-digit number">
                         
                         <label>Billing Address</label>
@@ -194,19 +199,19 @@
                             <div>
                                 <label>Balance Type</label>
                                 <select id="balanceType">
-                                    <option value="receive">To Receive (They owe us)</option>
-                                    <option value="pay">To Pay (We owe them)</option>
+                                    <option value="receive">To Receive (Debit)</option>
+                                    <option value="pay">To Pay (Credit)</option>
                                 </select>
                             </div>
                         </div>
-                        <button class="btn-blue" style="width:100%;" onclick="saveParty()">Save Party</button>
+                        <button class="btn-blue" style="width:100%;" onclick="saveParty()">Save Party Details</button>
                     </div>
 
                     <div class="card">
-                        <div class="card-header">Party List & Balances</div>
+                        <div class="card-header">Party Directory & Ledgers</div>
                         <div style="max-height:400px; overflow-y:auto;">
                             <table>
-                                <thead><tr><th>Party Name & Contact</th><th>Net Balance</th></tr></thead>
+                                <thead><tr><th>Party Info</th><th>Net Balance</th></tr></thead>
                                 <tbody id="party-table-body"></tbody>
                             </table>
                         </div>
@@ -217,25 +222,25 @@
             <div id="tab-items" class="content-area">
                 <div class="grid-dashboard">
                     <div class="card">
-                        <div class="card-header">Add/Edit Item</div>
-                        <label>Item Name *</label>
+                        <div class="card-header">Master Inventory Setup</div>
+                        <label>Product Name *</label>
                         <input type="text" id="itemName" placeholder="E.g. Ashirvaad Atta 5kg">
                         
-                        <label>Opening Stock Quantity</label>
+                        <label>Initial Stock Quantity</label>
                         <input type="number" id="itemStock" placeholder="0" value="0">
                         
                         <div class="grid-2">
-                            <div><label>Purchase Price (₹)</label><input type="number" id="itemPurchase" placeholder="0"></div>
-                            <div><label>Sale Price (₹)</label><input type="number" id="itemSale" placeholder="0"></div>
+                            <div><label>Purchase Cost (₹)</label><input type="number" id="itemPurchase" placeholder="0"></div>
+                            <div><label>Selling Price (₹)</label><input type="number" id="itemSale" placeholder="0"></div>
                         </div>
-                        <button class="btn-blue" style="width:100%;" onclick="saveItem()">Save Item</button>
+                        <button class="btn-blue" style="width:100%;" onclick="saveItem()">Save to Inventory</button>
                     </div>
                     
                     <div class="card">
-                        <div class="card-header">Current Inventory</div>
+                        <div class="card-header">Current Stock Status</div>
                         <div style="max-height:400px; overflow-y:auto;">
                             <table>
-                                <thead><tr><th>Item Name</th><th>Stock</th><th>Buy (₹)</th><th>Sell (₹)</th></tr></thead>
+                                <thead><tr><th>Product Name</th><th>Available Stock</th><th>Cost (₹)</th><th>Selling (₹)</th></tr></thead>
                                 <tbody id="item-table-body"></tbody>
                             </table>
                         </div>
@@ -247,15 +252,15 @@
                 <div class="card" style="margin-bottom:15px; padding:15px;">
                     <div class="grid-3">
                         <div>
-                            <label>Search or Add Party Name</label>
+                            <label>Customer Name (Search or Add New)</label>
                             <div class="search-wrapper">
-                                <input type="text" class="search-input" id="salePartySearch" placeholder="Search by Name/Phone..." onkeyup="filterParties('sale')" onfocus="filterParties('sale')">
+                                <input type="text" class="search-input" id="salePartySearch" placeholder="Type name..." onkeyup="filterParties('sale')" onfocus="filterParties('sale')">
                                 <div class="search-list" id="salePartyList"></div>
                                 <input type="hidden" id="salePartyId">
                             </div>
                         </div>
                         <div>
-                            <label>Phone Number</label>
+                            <label>Contact Number</label>
                             <input type="number" id="salePartyPhone" placeholder="Auto-filled / Enter new">
                         </div>
                         <div>
@@ -278,7 +283,7 @@
                         <div class="invoice-row" style="background:#f9fafb;">
                             <div>
                                 <div class="search-wrapper" style="margin:0;">
-                                    <input type="text" class="search-input" id="saleItemSearch" placeholder="Search Item..." onkeyup="filterItems('sale')" onfocus="filterItems('sale')">
+                                    <input type="text" class="search-input" id="saleItemSearch" placeholder="Type Item Name..." onkeyup="filterItems('sale')" onfocus="filterItems('sale')">
                                     <div class="search-list" id="saleItemList"></div>
                                     <input type="hidden" id="saleItemId">
                                 </div>
@@ -298,7 +303,7 @@
                             <label class="checkbox-wrapper"><input type="checkbox" id="saleFullPaid" onchange="toggleFullPay('sale')"> Mark as Fully Paid</label>
                             <label>Amount Received (₹)</label>
                             <input type="number" id="posReceived" placeholder="0" value="0" onkeyup="calcBalance('sale')">
-                            <div id="saleBalanceDue" style="font-weight:600; color:var(--primary-red); font-size:13px;">Balance Due: ₹0</div>
+                            <div id="saleBalanceDue" class="balance-indicator bal-green">Balance Due: ₹0</div>
                             <button class="btn-blue" style="width:100%; margin-top:15px;" onclick="checkout('sale')">Save & Send Invoice</button>
                         </div>
                     </div>
@@ -309,14 +314,14 @@
                 <div class="card" style="margin-bottom:15px; padding:15px;">
                     <div class="grid-3">
                         <div>
-                            <label>Search or Add Supplier Name</label>
+                            <label>Supplier Name (Search or Add New)</label>
                             <div class="search-wrapper">
-                                <input type="text" class="search-input" id="purPartySearch" placeholder="Search by Name/Phone..." onkeyup="filterParties('purchase')" onfocus="filterParties('purchase')">
+                                <input type="text" class="search-input" id="purPartySearch" placeholder="Type name..." onkeyup="filterParties('purchase')" onfocus="filterParties('purchase')">
                                 <div class="search-list" id="purPartyList"></div>
                                 <input type="hidden" id="purPartyId">
                             </div>
                         </div>
-                        <div><label>Phone Number</label><input type="number" id="purPartyPhone" placeholder="Auto-filled / Enter new"></div>
+                        <div><label>Contact Number</label><input type="number" id="purPartyPhone" placeholder="Auto-filled / Enter new"></div>
                         <div><label>Bill Date</label><input type="text" value="Today" readonly></div>
                     </div>
                 </div>
@@ -328,13 +333,13 @@
                         </div>
                         
                         <div id="pur-cart-container">
-                            <div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to record purchase</div>
+                            <div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to record purchase bill</div>
                         </div>
 
                         <div class="invoice-row" style="background:#f9fafb;">
                             <div>
                                 <div class="search-wrapper" style="margin:0;">
-                                    <input type="text" class="search-input" id="purItemSearch" placeholder="Search Item..." onkeyup="filterItems('purchase')" onfocus="filterItems('purchase')">
+                                    <input type="text" class="search-input" id="purItemSearch" placeholder="Type Item Name..." onkeyup="filterItems('purchase')" onfocus="filterItems('purchase')">
                                     <div class="search-list" id="purItemList"></div>
                                     <input type="hidden" id="purItemId">
                                 </div>
@@ -354,7 +359,7 @@
                             <label class="checkbox-wrapper"><input type="checkbox" id="purFullPaid" onchange="toggleFullPay('purchase')"> Mark as Fully Paid</label>
                             <label>Amount Paid (₹)</label>
                             <input type="number" id="purPaid" placeholder="0" value="0" onkeyup="calcBalance('purchase')">
-                            <div id="purBalanceDue" style="font-weight:600; color:var(--primary-red); font-size:13px;">Balance Due: ₹0</div>
+                            <div id="purBalanceDue" class="balance-indicator bal-red">Balance Pending: ₹0</div>
                             <button class="btn-blue" style="width:100%; margin-top:15px;" onclick="checkout('purchase')">Save Purchase Bill</button>
                         </div>
                     </div>
@@ -499,12 +504,9 @@
         });
     }
 
-    // --- AUTOCOMPLETE SEARCH LOGIC ---
-    // Hide lists when clicking outside
+    // --- AUTOCOMPLETE LOGIC ---
     document.addEventListener('click', e => {
-        if(!e.target.closest('.search-wrapper')) {
-            document.querySelectorAll('.search-list').forEach(l => l.classList.remove('show'));
-        }
+        if(!e.target.closest('.search-wrapper')) document.querySelectorAll('.search-list').forEach(l => l.classList.remove('show'));
     });
 
     function filterParties(type) {
@@ -512,9 +514,7 @@
         const list = document.getElementById(`${type==='sale'?'sale':'pur'}PartyList`);
         const query = input.value.toLowerCase().trim();
         
-        // Reset hidden ID if user is typing new name
-        document.getElementById(`${type==='sale'?'sale':'pur'}PartyId`).value = "";
-
+        document.getElementById(`${type==='sale'?'sale':'pur'}PartyId`).value = ""; // Reset hidden ID
         list.innerHTML = '';
         if(query.length < 1) { list.classList.remove('show'); return; }
 
@@ -524,7 +524,6 @@
             if(p.name.toLowerCase().includes(query) || (p.phone && p.phone.includes(query))) {
                 list.innerHTML += `<div class="search-item" onclick="selectParty('${key}', '${p.name}', '${p.phone || ''}', '${type}')">
                     <span><strong>${p.name}</strong> <small style="color:var(--text-gray);margin-left:5px;">${p.phone||''}</small></span>
-                    <span style="color:${p.balance>0?'var(--success-green)':'var(--primary-red)'}">₹${Math.abs(p.balance)}</span>
                 </div>`;
                 count++;
             }
@@ -545,6 +544,7 @@
         const list = document.getElementById(`${type==='sale'?'sale':'pur'}ItemList`);
         const query = input.value.toLowerCase().trim();
 
+        document.getElementById(`${type==='sale'?'sale':'pur'}ItemId`).value = ""; // Reset hidden ID
         list.innerHTML = '';
         if(query.length < 1) { list.classList.remove('show'); return; }
 
@@ -567,24 +567,25 @@
         const prefix = type==='sale' ? 'sale' : 'pur';
         document.getElementById(`${prefix}ItemId`).value = id;
         document.getElementById(`${prefix}ItemSearch`).value = name;
-        document.getElementById(`${prefix}ItemPrice`).value = price;
-        document.getElementById(`${prefix}ItemTotal`).innerText = `₹${price}`;
+        if(price > 0) document.getElementById(`${prefix}ItemPrice`).value = price;
+        calcRow(type);
         document.getElementById(`${prefix}ItemList`).classList.remove('show');
     }
 
-    // Auto-calc amount row
     ['sale', 'purchase'].forEach(t => {
-        let prefix = t==='sale'?'sale':'pur';
-        document.getElementById(`${prefix}ItemQty`).addEventListener('keyup', calcRow);
-        document.getElementById(`${prefix}ItemPrice`).addEventListener('keyup', calcRow);
-        function calcRow() {
-            let q = parseInt(document.getElementById(`${prefix}ItemQty`).value)||0;
-            let p = parseFloat(document.getElementById(`${prefix}ItemPrice`).value)||0;
-            document.getElementById(`${prefix}ItemTotal`).innerText = `₹${q*p}`;
-        }
+        let p = t==='sale'?'sale':'pur';
+        document.getElementById(`${p}ItemQty`).addEventListener('keyup', () => calcRow(t));
+        document.getElementById(`${p}ItemPrice`).addEventListener('keyup', () => calcRow(t));
     });
 
-    // --- BILLING LOGIC (SALE & PURCHASE) ---
+    function calcRow(type) {
+        let prefix = type==='sale'?'sale':'pur';
+        let q = parseInt(document.getElementById(`${prefix}ItemQty`).value)||0;
+        let p = parseFloat(document.getElementById(`${prefix}ItemPrice`).value)||0;
+        document.getElementById(`${prefix}ItemTotal`).innerText = `₹${q*p}`;
+    }
+
+    // --- BILLING LOGIC ---
     function toggleFullPay(type) {
         const isSale = type === 'sale';
         const isChecked = document.getElementById(`${isSale?'sale':'pur'}FullPaid`).checked;
@@ -603,25 +604,46 @@
         const diff = total - paid;
         
         const balLabel = document.getElementById(`${isSale?'sale':'pur'}BalanceDue`);
-        balLabel.innerText = `Balance Due: ₹${diff}`;
-        balLabel.className = diff > 0 ? 'bal-red' : 'bal-green';
-        balLabel.style.color = diff > 0 ? 'var(--primary-red)' : 'var(--success-green)';
+        balLabel.innerText = `Balance Due: ₹${Math.abs(diff)}`;
+        balLabel.className = `balance-indicator ${diff > 0 ? 'bal-red' : 'bal-green'}`;
     }
 
-    function addPosItem(type) {
+    async function addPosItem(type) {
         const isSale = type === 'sale';
         const prefix = isSale ? 'sale' : 'pur';
         
-        const key = document.getElementById(`${prefix}ItemId`).value;
-        const name = document.getElementById(`${prefix}ItemSearch`).value;
+        let key = document.getElementById(`${prefix}ItemId`).value;
+        let name = document.getElementById(`${prefix}ItemSearch`).value.trim();
         const qty = parseInt(document.getElementById(`${prefix}ItemQty`).value);
         const price = parseFloat(document.getElementById(`${prefix}ItemPrice`).value);
         
-        if(!key || !qty || !price) return showToast("Search & select item properly", "error");
-        if(isSale && itemsData[key].stock < qty) return showToast(`Low Stock! Only ${itemsData[key].stock} left.`, "error");
+        if(!name || isNaN(qty) || qty <= 0 || isNaN(price) || price < 0) {
+            return showToast("Enter valid Item Name, Quantity, and Price.", "error");
+        }
+
+        // If user typed name without selecting, check if it exists in DB
+        if(!key) {
+            for(let k in itemsData) {
+                if(itemsData[k].name.toLowerCase() === name.toLowerCase()) { key = k; break; }
+            }
+        }
+
+        // AUTO-CREATE NEW ITEM LOGIC
+        if(!key) {
+            key = "ITM_" + Date.now();
+            let newItem = { name: name, stock: 0, purchasePrice: isSale ? 0 : price, salePrice: isSale ? price : 0 };
+            await db.ref(`users/${uid}/items/${key}`).set(newItem);
+            itemsData[key] = newItem; 
+            showToast(`New item '${name}' automatically added to Inventory!`, 'success');
+        }
+
+        // Stock Warning
+        if(isSale && itemsData[key].stock < qty) {
+            showToast(`Note: Stock for '${name}' will go negative.`, "error");
+        }
 
         let targetCart = isSale ? saleCart : purchaseCart;
-        targetCart.push({ key, name: name, qty, price, total: qty*price });
+        targetCart.push({ key, name: itemsData[key].name, qty, price, total: qty*price });
         updateCart(type);
         
         document.getElementById(`${prefix}ItemId`).value = ''; document.getElementById(`${prefix}ItemSearch`).value = '';
@@ -636,7 +658,7 @@
         let t = 0;
         
         if(cartArr.length===0){ 
-            c.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to create invoice</div>'; 
+            c.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to generate invoice</div>'; 
             document.getElementById(isSale ? 'pos-total' : 'pur-total').innerText="0"; 
             calcBalance(type); return; 
         }
@@ -654,7 +676,6 @@
         calcBalance(type);
     }
 
-    // --- CHECKOUT WITH DYNAMIC PARTY CREATION ---
     async function checkout(type) {
         const isSale = type === 'sale';
         const prefix = isSale ? 'sale' : 'pur';
@@ -671,44 +692,38 @@
         const billId = (isSale?"INV_":"PUR_") + Date.now();
         
         try {
-            // DYNAMIC PARTY CREATION: Agar ID nahi hai, par naam likha hai, to nayi party bana do!
+            // AUTO-CREATE PARTY LOGIC
             if(!partyId && partyNameInput !== "") {
                 partyId = "PRT_" + Date.now();
-                await db.ref(`users/${uid}/parties/${partyId}`).set({ name: partyNameInput, phone: partyPhoneInput, balance: 0, type: "auto" });
-                showToast(`New party '${partyNameInput}' created automatically`, 'success');
+                await db.ref(`users/${uid}/parties/${partyId}`).set({ name: partyNameInput, phone: partyPhoneInput, balance: 0, type: isSale?"customer":"supplier" });
+                showToast(`New party '${partyNameInput}' created automatically!`, 'success');
             }
 
-            // 1. Save Bill
             const billData = { partyId, partyName: partyNameInput || "Cash", total, paid, items: cartArr, date: new Date().toISOString() };
             if(isSale) await db.ref(`users/${uid}/sales/${billId}`).set(billData);
             else await db.ref(`users/${uid}/purchases/${billId}`).set(billData);
             
-            // 2. Update Stock
             for(let i of cartArr) {
                 let newStock = isSale ? (itemsData[i.key].stock - i.qty) : (itemsData[i.key].stock + i.qty);
                 await db.ref(`users/${uid}/items/${i.key}`).update({ stock: newStock });
             }
 
-            // 3. Update Ledger (if party selected/created)
             if(partyId) {
-                // Fetch latest balance inside transaction to be safe
                 const snap = await db.ref(`users/${uid}/parties/${partyId}`).once('value');
                 let currentBal = snap.exists() ? snap.val().balance : 0;
                 let udhaar = total - paid; 
-                let newBal = isSale ? (currentBal + udhaar) : (currentBal - udhaar); // Sale increases receivable(+), Purchase decreases(-)
+                let newBal = isSale ? (currentBal + udhaar) : (currentBal - udhaar); 
                 await db.ref(`users/${uid}/parties/${partyId}`).update({ balance: newBal });
             }
 
-            // Reset Form
             if(isSale) saleCart = []; else purchaseCart = [];
             updateCart(type); 
             document.getElementById(`${prefix}PartyId`).value=''; document.getElementById(`${prefix}PartySearch`).value=''; document.getElementById(`${prefix}PartyPhone`).value='';
             document.getElementById(`${prefix}FullPaid`).checked = false; document.getElementById(isSale?'posReceived':'purPaid').removeAttribute('readonly');
             document.getElementById(isSale?'posReceived':'purPaid').value = '0';
             
-            showToast(`${isSale?'Sale Invoice':'Purchase Bill'} Generated!`);
+            showToast(`${isSale?'Sales Invoice':'Purchase Bill'} successfully recorded!`, "success");
 
-            // WhatsApp formatting (Only for Sale)
             if(isSale && partyPhoneInput) {
                 let msg = `🧾 *${(partyNameInput||"CASH CUSTOMER").toUpperCase()} - TAX INVOICE*\nInv No: ${billId}\n\n`;
                 cartArr.forEach(i => { msg += `▪ ${i.name} (${i.qty}) = Rs.${i.total}\n`; });
