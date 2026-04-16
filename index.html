@@ -1,173 +1,727 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SmartShop ERP - Vyapar Edition</title>
+    <title>SmartShop ERP | Vyapar Pro Edition</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --sidebar-bg: #1e2937; --sidebar-hover: #334155;
-            --main-bg: #f8fafc; --card-bg: #ffffff;
-            --primary: #3b82f6; --red: #ef4444; --green: #10b981;
-            --text: #1e2937; --gray: #64748b;
+            --sidebar-bg: #1c2437; --sidebar-hover: #2a3449;
+            --main-bg: #f4f5f8; --card-bg: #ffffff;
+            --primary-blue: #0052cc; --primary-red: #ef4444; --success-green: #10b981;
+            --text-dark: #1f2937; --text-gray: #6b7280;
+            --border-light: #e5e7eb; --radius: 8px;
         }
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
-        body { background:var(--main-bg); color:var(--text); height:100vh; overflow:hidden; display:flex; }
 
-        .page { display:none; width:100%; height:100%; }
-        .active-page { display:flex; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--main-bg); color: var(--text-dark); height: 100vh; overflow: hidden; display: flex; }
 
-        .sidebar { width:260px; background:var(--sidebar-bg); color:white; display:flex; flex-direction:column; }
-        .brand { padding:18px 20px; font-size:20px; font-weight:700; border-bottom:1px solid rgba(255,255,255,0.1); }
-        .nav-btn { width:100%; padding:14px 20px; background:transparent; color:#cbd5e1; text-align:left; border:none; font-size:14.5px; cursor:pointer; display:flex; align-items:center; gap:12px; }
-        .nav-btn:hover, .nav-btn.active { background:var(--sidebar-hover); color:white; border-left:4px solid #f97316; }
-
-        .main-content { flex:1; display:flex; flex-direction:column; overflow:hidden; }
-        .header { background:white; padding:14px 25px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; box-shadow:0 1px 3px rgba(0,0,0,0.05); }
+        .hidden { display: none !important; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; }
+        .grid-dashboard { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
         
-        .content-area { padding:20px; overflow-y:auto; display:none; flex-direction:column; gap:20px; }
-        .content-area.active { display:flex; }
+        input, select, textarea { width: 100%; padding: 10px 14px; margin-bottom: 12px; border: 1px solid #d1d5db; border-radius: 4px; outline: none; font-size: 14px; background: #fff; transition: 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary-blue); box-shadow: 0 0 0 3px rgba(0,82,204,0.1); }
+        input[readonly] { background: #f3f4f6; cursor: not-allowed; }
+        label { font-size: 12px; color: var(--text-gray); font-weight: 500; margin-bottom: 4px; display: block; }
+        
+        button { padding: 10px 16px; border: none; border-radius: 4px; font-weight: 500; font-size: 14px; cursor: pointer; color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        button:hover { opacity: 0.9; }
+        .btn-blue { background: var(--primary-blue); }
+        .btn-red { background: var(--primary-red); }
+        .btn-green { background: var(--success-green); }
+        .btn-outline { background: #fff; color: var(--primary-blue); border: 1px solid var(--primary-blue); }
 
-        .card { background:white; border:1px solid #e2e8f0; border-radius:12px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,0.04); }
+        .page { width: 100%; height: 100%; display: none; }
+        .active-page { display: flex; }
 
-        input, select, textarea, button { 
-            padding:10px 14px; border-radius:8px; border:1px solid #cbd5e0; font-size:14px; 
-        }
-        input:focus, select:focus { border-color:var(--primary); outline:none; }
-        button { cursor:pointer; font-weight:600; }
+        /* Auth Screen */
+        #pg-auth { justify-content: center; align-items: center; background: #fff; flex-direction: column; }
+        .auth-box { background: #fff; padding: 40px; border-radius: 12px; border: 1px solid var(--border-light); width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
 
-        .btn-primary { background:var(--primary); color:white; border:none; }
-        .btn-success { background:var(--green); color:white; border:none; }
-        .btn-danger { background:var(--red); color:white; border:none; }
+        /* Sidebar */
+        .sidebar { width: 240px; background: var(--sidebar-bg); color: #fff; display: flex; flex-direction: column; z-index: 10; }
+        .brand { padding: 15px 20px; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .nav-list { padding: 10px 0; overflow-y: auto; flex: 1; }
+        .nav-btn { width: 100%; background: transparent; color: #d1d5db; text-align: left; padding: 12px 20px; font-weight: 400; font-size: 14px; justify-content: flex-start; gap: 12px; border-radius: 0;}
+        .nav-btn i { width: 20px; text-align: center; }
+        .nav-btn:hover, .nav-btn.active { background: var(--sidebar-hover); color: #fff; border-left: 4px solid var(--primary-red); }
 
-        table { width:100%; border-collapse:collapse; font-size:14px; }
-        th, td { padding:12px 15px; text-align:left; border-bottom:1px solid #f1f5f9; }
-        th { background:#f8fafc; font-weight:600; color:var(--gray); }
+        /* Main Content */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .header { background: #fff; padding: 12px 25px; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+        .content-area { padding: 25px; display: none; }
+        .content-area.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .toast { position:fixed; bottom:20px; right:20px; padding:14px 20px; border-radius:8px; color:white; box-shadow:0 10px 15px rgba(0,0,0,0.2); z-index:9999; }
+        /* Cards & Tables */
+        .card { background: var(--card-bg); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); margin-bottom: 20px; }
+        .card-header { font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light); }
+        .amount { font-size: 24px; font-weight: 700; color: var(--text-dark); margin-bottom: 5px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-light); }
+        th { color: var(--text-gray); font-weight: 600; background: #f9fafb; text-transform: uppercase; font-size: 11px; }
+        tr:hover td { background: #f9fafb; }
+
+        /* CUSTOM SEARCHABLE DROPDOWN (AUTOCOMPLETE) */
+        .search-wrapper { position: relative; width: 100%; margin-bottom: 12px; }
+        .search-input { width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 14px; outline: none; margin-bottom: 0; }
+        .search-input:focus { border-color: var(--primary-blue); }
+        .search-list { position: absolute; top: 100%; left: 0; width: 100%; background: #fff; border: 1px solid var(--border-light); border-radius: 4px; max-height: 200px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: none; }
+        .search-list.show { display: block; }
+        .search-item { padding: 10px 14px; cursor: pointer; font-size: 13px; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; }
+        .search-item:hover { background: #f3f4f6; color: var(--primary-blue); }
+        .search-item strong { font-weight: 600; }
+
+        /* Invoice Layout Details */
+        .invoice-table { border: 1px solid var(--border-light); border-radius: 4px; overflow: hidden; margin-bottom: 15px; }
+        .invoice-row { display: grid; grid-template-columns: 3fr 1fr 1fr 1.5fr 0.5fr; gap: 1px; background: var(--border-light); border-bottom: 1px solid var(--border-light); }
+        .invoice-row > div { background: #fff; padding: 10px; display: flex; align-items: center; }
+        .invoice-header > div { background: #f9fafb; font-weight: 600; color: var(--text-gray); font-size: 11px; text-transform: uppercase; }
+
+        .checkbox-wrapper { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; cursor: pointer; user-select: none; margin-bottom: 10px; }
+        .checkbox-wrapper input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary-blue); }
+
+        /* Toasts */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 12px 20px; border-radius: 4px; color: #fff; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); animation: slideIn 0.3s forwards; }
+        .toast.success { background: var(--success-green); }
+        .toast.error { background: var(--primary-red); }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body>
 
-<div id="toast-container"></div>
+    <div id="toast-container"></div>
 
-<!-- Auth Page -->
-<div id="pg-auth" class="page active-page" style="justify-content:center;align-items:center;background:#fff;">
-    <div style="background:white;padding:40px;border-radius:16px;border:1px solid #e2e8f0;width:380px;box-shadow:0 10px 30px rgba(0,0,0,0.08);text-align:center;">
-        <h2 style="color:#1e2937;margin-bottom:8px;">SmartShop <span style="color:#f97316;">ERP</span></h2>
-        <p style="color:#64748b;margin-bottom:25px;">Vyapar jaisa Billing Software</p>
-        <input type="email" id="email" placeholder="Email" style="width:100%;margin-bottom:12px;">
-        <input type="password" id="pass" placeholder="Password" style="width:100%;margin-bottom:20px;">
-        <button class="btn-primary" style="width:100%;padding:14px;" onclick="login()">Login / Register</button>
-    </div>
-</div>
-
-<!-- Dashboard -->
-<div id="pg-dash" class="page">
-    <div class="sidebar">
-        <div class="brand"><i class="fa-solid fa-store"></i> SmartShop</div>
-        <div style="flex:1;overflow-y:auto;">
-            <button class="nav-btn active" onclick="switchTab('tab-home')"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
-            <button class="nav-btn" onclick="switchTab('tab-parties')"><i class="fa-solid fa-users"></i> Parties</button>
-            <button class="nav-btn" onclick="switchTab('tab-items')"><i class="fa-solid fa-box"></i> Items</button>
-            <button class="nav-btn" onclick="switchTab('tab-sale')"><i class="fa-solid fa-file-invoice"></i> Sales Invoice</button>
-            <button class="nav-btn" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-truck"></i> Purchase</button>
-            <button class="nav-btn" onclick="switchTab('tab-expense')"><i class="fa-solid fa-money-bill"></i> Expense</button>
-            <button class="nav-btn" onclick="switchTab('tab-reports')"><i class="fa-solid fa-chart-bar"></i> Reports</button>
+    <div id="pg-auth" class="page active-page">
+        <div class="auth-box">
+            <h2 style="color:var(--text-dark); margin-bottom:5px;">SmartShop <span style="color:var(--primary-red)">ERP</span></h2>
+            <p style="color:var(--text-gray); font-size:13px; margin-bottom:25px;">Professional Access Portal</p>
+            <input type="email" id="email" placeholder="Administrator Email">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn-blue" style="width:100%; border-radius:4px;" onclick="login()">Authenticate securely</button>
         </div>
-        <button class="nav-btn" style="color:#ef4444;" onclick="auth.signOut()"><i class="fa-solid fa-power-off"></i> Sign Out</button>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h3 id="top-title">Dashboard</h3>
-            <div>
-                <button class="btn-danger" onclick="switchTab('tab-sale')">+ New Sale</button>
-                <button class="btn-primary" onclick="switchTab('tab-purchase')">+ New Purchase</button>
+    <div id="pg-dash" class="page">
+        <div class="sidebar">
+            <div class="brand">
+                <div style="background:var(--primary-red); color:#fff; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:6px;"><i class="fa-solid fa-store"></i></div>
+                SmartStore
+            </div>
+            <div class="nav-list">
+                <button class="nav-btn active" onclick="switchTab('tab-home')"><i class="fa-solid fa-chart-pie"></i> Business Overview</button>
+                <button class="nav-btn" onclick="switchTab('tab-parties')"><i class="fa-solid fa-building-user"></i> Parties & Ledgers</button>
+                <button class="nav-btn" onclick="switchTab('tab-items')"><i class="fa-solid fa-boxes-stacked"></i> Inventory</button>
+                <button class="nav-btn" onclick="switchTab('tab-sale')"><i class="fa-solid fa-file-invoice-dollar"></i> Sales Invoice</button>
+                <button class="nav-btn" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-truck-ramp-box"></i> Purchase Bill</button>
+                <button class="nav-btn" style="color:var(--primary-red);" onclick="auth.signOut()"><i class="fa-solid fa-power-off"></i> Sign Out</button>
             </div>
         </div>
 
-        <!-- Content Areas -->
-        <div id="tab-home" class="content-area active">Dashboard Content (Tumhare purane dashboard ko yahan rakh sakte ho)</div>
-        
-        <div id="tab-sale" class="content-area">
-            <div class="card">
-                <h3>GST Sales Invoice</h3>
-                <select id="saleParty"></select>
-                <select id="saleItem"></select>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-                    <input type="number" id="saleQty" placeholder="Qty" value="1">
-                    <input type="number" id="salePrice" placeholder="Rate">
-                    <button class="btn-primary" onclick="addToCart('sale')">Add</button>
+        <div class="main-content">
+            <div class="header">
+                <h3 style="font-size: 16px; color: var(--text-dark); font-weight: 600;" id="top-title">Business Overview</h3>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-red" onclick="switchTab('tab-sale')"><i class="fa-solid fa-plus"></i> Add Sale</button>
+                    <button class="btn-blue" onclick="switchTab('tab-purchase')"><i class="fa-solid fa-plus"></i> Add Purchase</button>
                 </div>
-                <div id="sale-cart"></div>
-                <button class="btn-success" style="width:100%;margin-top:15px;padding:14px;" onclick="checkoutSale()">Save & Generate Invoice</button>
             </div>
+
+            <div id="tab-home" class="content-area active">
+                <div class="grid-dashboard">
+                    <div>
+                        <div class="grid-2">
+                            <div class="card" style="grid-column: span 2;">
+                                <div class="card-header"><i class="fa-solid fa-chart-line" style="color:var(--primary-blue);"></i> Total Sales Revenue</div>
+                                <div class="amount">₹ <span id="dash-total-sale">0.00</span></div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header"><span style="color:var(--success-green);"><i class="fa-solid fa-arrow-down"></i> To Receive</span></div>
+                                <div class="amount">₹ <span id="dash-receive">0.00</span></div>
+                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">Pending from parties</div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header"><span style="color:var(--primary-red);"><i class="fa-solid fa-arrow-up"></i> To Pay</span></div>
+                                <div class="amount">₹ <span id="dash-pay">0.00</span></div>
+                                <div style="color:var(--text-gray); font-size:11px; margin-top:5px;">Pending to suppliers</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="card">
+                            <div class="card-header">Inventory Valuation</div>
+                            <div style="font-size:16px; font-weight:600; margin-bottom:10px;">₹ <span id="dash-stock-value">0.00</span></div>
+                            <div style="color:var(--primary-red); font-size:12px; font-weight:600;"><span id="dash-low-stock">0</span> Low Stock Alerts</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">Cash in Hand</div>
+                            <div style="font-size:16px; font-weight:600; color:var(--success-green);">₹ <span id="dash-cash">0.00</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-parties" class="content-area">
+                <div class="grid-dashboard">
+                    <div class="card">
+                        <div class="card-header">Add New Party</div>
+                        <label>Party Name *</label>
+                        <input type="text" id="partyName" placeholder="Enter Party Name">
+                        
+                        <label>Phone Number</label>
+                        <input type="number" id="partyPhone" placeholder="10-digit number">
+                        
+                        <label>Billing Address</label>
+                        <textarea id="partyAddress" rows="2" placeholder="Complete Address"></textarea>
+                        
+                        <div class="grid-2">
+                            <div>
+                                <label>Opening Balance (₹)</label>
+                                <input type="number" id="partyBalance" placeholder="0" value="0">
+                            </div>
+                            <div>
+                                <label>Balance Type</label>
+                                <select id="balanceType">
+                                    <option value="receive">To Receive (They owe us)</option>
+                                    <option value="pay">To Pay (We owe them)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button class="btn-blue" style="width:100%;" onclick="saveParty()">Save Party</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Party List & Balances</div>
+                        <div style="max-height:400px; overflow-y:auto;">
+                            <table>
+                                <thead><tr><th>Party Name & Contact</th><th>Net Balance</th></tr></thead>
+                                <tbody id="party-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-items" class="content-area">
+                <div class="grid-dashboard">
+                    <div class="card">
+                        <div class="card-header">Add/Edit Item</div>
+                        <label>Item Name *</label>
+                        <input type="text" id="itemName" placeholder="E.g. Ashirvaad Atta 5kg">
+                        
+                        <label>Opening Stock Quantity</label>
+                        <input type="number" id="itemStock" placeholder="0" value="0">
+                        
+                        <div class="grid-2">
+                            <div><label>Purchase Price (₹)</label><input type="number" id="itemPurchase" placeholder="0"></div>
+                            <div><label>Sale Price (₹)</label><input type="number" id="itemSale" placeholder="0"></div>
+                        </div>
+                        <button class="btn-blue" style="width:100%;" onclick="saveItem()">Save Item</button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">Current Inventory</div>
+                        <div style="max-height:400px; overflow-y:auto;">
+                            <table>
+                                <thead><tr><th>Item Name</th><th>Stock</th><th>Buy (₹)</th><th>Sell (₹)</th></tr></thead>
+                                <tbody id="item-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-sale" class="content-area">
+                <div class="card" style="margin-bottom:15px; padding:15px;">
+                    <div class="grid-3">
+                        <div>
+                            <label>Search or Add Party Name</label>
+                            <div class="search-wrapper">
+                                <input type="text" class="search-input" id="salePartySearch" placeholder="Search by Name/Phone..." onkeyup="filterParties('sale')" onfocus="filterParties('sale')">
+                                <div class="search-list" id="salePartyList"></div>
+                                <input type="hidden" id="salePartyId">
+                            </div>
+                        </div>
+                        <div>
+                            <label>Phone Number</label>
+                            <input type="number" id="salePartyPhone" placeholder="Auto-filled / Enter new">
+                        </div>
+                        <div>
+                            <label>Invoice Date</label>
+                            <input type="text" value="Today" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding:15px;">
+                    <div class="invoice-table">
+                        <div class="invoice-row invoice-header">
+                            <div>Item Details</div><div>Qty</div><div>Price/Unit</div><div>Amount</div><div>Action</div>
+                        </div>
+                        
+                        <div id="sale-cart-container">
+                            <div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to create invoice</div>
+                        </div>
+
+                        <div class="invoice-row" style="background:#f9fafb;">
+                            <div>
+                                <div class="search-wrapper" style="margin:0;">
+                                    <input type="text" class="search-input" id="saleItemSearch" placeholder="Search Item..." onkeyup="filterItems('sale')" onfocus="filterItems('sale')">
+                                    <div class="search-list" id="saleItemList"></div>
+                                    <input type="hidden" id="saleItemId">
+                                </div>
+                            </div>
+                            <div><input type="number" id="saleItemQty" placeholder="1" value="1" style="margin:0;"></div>
+                            <div><input type="number" id="saleItemPrice" placeholder="Price" style="margin:0;"></div>
+                            <div style="font-weight:600;" id="saleItemTotal">₹0</div>
+                            <div><button class="btn-outline" style="padding:6px 10px; width:100%;" onclick="addPosItem('sale')">Add</button></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:30px; margin-top:20px;">
+                        <div style="width:350px; background:#f9fafb; padding:15px; border:1px solid var(--border-light); border-radius:4px;">
+                            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-bottom:15px;">
+                                <span>Total Amount:</span><span style="color:var(--success-green);">₹<span id="pos-total">0</span></span>
+                            </div>
+                            <label class="checkbox-wrapper"><input type="checkbox" id="saleFullPaid" onchange="toggleFullPay('sale')"> Mark as Fully Paid</label>
+                            <label>Amount Received (₹)</label>
+                            <input type="number" id="posReceived" placeholder="0" value="0" onkeyup="calcBalance('sale')">
+                            <div id="saleBalanceDue" style="font-weight:600; color:var(--primary-red); font-size:13px;">Balance Due: ₹0</div>
+                            <button class="btn-blue" style="width:100%; margin-top:15px;" onclick="checkout('sale')">Save & Send Invoice</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-purchase" class="content-area">
+                <div class="card" style="margin-bottom:15px; padding:15px;">
+                    <div class="grid-3">
+                        <div>
+                            <label>Search or Add Supplier Name</label>
+                            <div class="search-wrapper">
+                                <input type="text" class="search-input" id="purPartySearch" placeholder="Search by Name/Phone..." onkeyup="filterParties('purchase')" onfocus="filterParties('purchase')">
+                                <div class="search-list" id="purPartyList"></div>
+                                <input type="hidden" id="purPartyId">
+                            </div>
+                        </div>
+                        <div><label>Phone Number</label><input type="number" id="purPartyPhone" placeholder="Auto-filled / Enter new"></div>
+                        <div><label>Bill Date</label><input type="text" value="Today" readonly></div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding:15px;">
+                    <div class="invoice-table">
+                        <div class="invoice-row invoice-header">
+                            <div>Item Details</div><div>Qty</div><div>Cost/Unit</div><div>Amount</div><div>Action</div>
+                        </div>
+                        
+                        <div id="pur-cart-container">
+                            <div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to record purchase</div>
+                        </div>
+
+                        <div class="invoice-row" style="background:#f9fafb;">
+                            <div>
+                                <div class="search-wrapper" style="margin:0;">
+                                    <input type="text" class="search-input" id="purItemSearch" placeholder="Search Item..." onkeyup="filterItems('purchase')" onfocus="filterItems('purchase')">
+                                    <div class="search-list" id="purItemList"></div>
+                                    <input type="hidden" id="purItemId">
+                                </div>
+                            </div>
+                            <div><input type="number" id="purItemQty" placeholder="1" value="1" style="margin:0;"></div>
+                            <div><input type="number" id="purItemPrice" placeholder="Cost" style="margin:0;"></div>
+                            <div style="font-weight:600;" id="purItemTotal">₹0</div>
+                            <div><button class="btn-outline" style="padding:6px 10px; width:100%;" onclick="addPosItem('purchase')">Add</button></div>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:flex-end; gap:30px; margin-top:20px;">
+                        <div style="width:350px; background:#f9fafb; padding:15px; border:1px solid var(--border-light); border-radius:4px;">
+                            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:700; margin-bottom:15px;">
+                                <span>Total Amount:</span><span style="color:var(--primary-red);">₹<span id="pur-total">0</span></span>
+                            </div>
+                            <label class="checkbox-wrapper"><input type="checkbox" id="purFullPaid" onchange="toggleFullPay('purchase')"> Mark as Fully Paid</label>
+                            <label>Amount Paid (₹)</label>
+                            <input type="number" id="purPaid" placeholder="0" value="0" onkeyup="calcBalance('purchase')">
+                            <div id="purBalanceDue" style="font-weight:600; color:var(--primary-red); font-size:13px;">Balance Due: ₹0</div>
+                            <button class="btn-blue" style="width:100%; margin-top:15px;" onclick="checkout('purchase')">Save Purchase Bill</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-
-        <!-- Baaki tabs (parties, items, purchase, expense, reports) ko baad mein pura expand kar sakte hain -->
-
     </div>
-</div>
 
 <script>
-// Firebase Config (Apna rakhna)
-const firebaseConfig = { /* tumhara config */ };
+    // 1. FIREBASE CONFIGURATION
+    const firebaseConfig = {
+        apiKey: "AIzaSyAi7jxnVYFKbCc2baS3EQCIE_cTeMt9h34",
+        authDomain: "smartshop-erp.firebaseapp.com",
+        projectId: "smartshop-erp",
+        storageBucket: "smartshop-erp.firebasestorage.app",
+        messagingSenderId: "346824677876",
+        appId: "1:346824677876:web:c259742dadfd37ec85c1a1",
+        measurementId: "G-G6W0B6XFG1",
+        databaseURL: "https://smartshop-erp-default-rtdb.firebaseio.com" 
+    };
 
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.database();
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    
+    let uid = null;
+    let partiesData = {}; let itemsData = {}; 
+    let saleCart = []; let purchaseCart = [];
 
-let uid = null;
-let currentUserData = {};
-
-// Login
-function login() {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('pass').value;
-    auth.signInWithEmailAndPassword(email, pass).catch(() => {
-        auth.createUserWithEmailAndPassword(email, pass);
-    });
-}
-
-auth.onAuthStateChanged(user => {
-    if(user) {
-        uid = user.uid;
-        document.getElementById('pg-auth').classList.remove('active-page');
-        document.getElementById('pg-dash').classList.add('active-page');
-        loadAllData();
+    function showToast(msg, type='success') {
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<i class="fa-solid ${type==='success'?'fa-check-circle':'fa-circle-exclamation'}"></i> ${msg}`;
+        document.getElementById('toast-container').appendChild(t);
+        setTimeout(() => t.remove(), 3000);
     }
-});
 
-function showToast(msg, type = 'success') {
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
-    t.textContent = msg;
-    document.getElementById('toast-container').appendChild(t);
-    setTimeout(() => t.remove(), 3000);
-}
+    auth.onAuthStateChanged(user => {
+        if(user){
+            uid = user.uid;
+            document.getElementById('pg-auth').classList.remove('active-page');
+            document.getElementById('pg-dash').classList.add('active-page');
+            fetchData();
+        } else {
+            uid = null;
+            document.getElementById('pg-dash').classList.remove('active-page');
+            document.getElementById('pg-auth').classList.add('active-page');
+        }
+    });
 
-function switchTab(tab) {
-    document.querySelectorAll('.content-area').forEach(el => el.classList.remove('active'));
-    document.getElementById(tab).classList.add('active');
-    document.getElementById('top-title').innerText = tab.replace('tab-','').toUpperCase();
-}
+    function login() {
+        const e = document.getElementById('email').value.trim(), p = document.getElementById('pass').value;
+        if(!e || !p) return showToast("Credentials required", "error");
+        auth.signInWithEmailAndPassword(e, p).catch(err => {
+            if(err.code === 'auth/user-not-found') auth.createUserWithEmailAndPassword(e, p);
+            else showToast(err.message, "error");
+        });
+    }
 
-// Placeholder for more features
-function loadAllData() {
-    showToast("Welcome to SmartShop ERP - Vyapar Mode");
-}
+    function switchTab(tabId) {
+        document.querySelectorAll('.content-area').forEach(e => e.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        
+        const titles = {'tab-home':'Business Overview', 'tab-parties':'Party Management', 'tab-items':'Inventory Management', 'tab-sale':'Sales Invoice', 'tab-purchase':'Purchase Bill'};
+        document.getElementById('top-title').innerText = titles[tabId];
+    }
 
-// Tum chaaho to main pura code ek-ek karke add kar sakta hoon (GST, Reports, Print etc.)
+    // --- FETCH DATA ---
+    function fetchData() {
+        db.ref(`users/${uid}/parties`).on('value', snap => {
+            partiesData = snap.val() || {};
+            let ptBody = document.getElementById('party-table-body');
+            ptBody.innerHTML = ''; 
+            
+            let receive = 0, pay = 0;
+            for(let key in partiesData) {
+                let p = partiesData[key];
+                let color = p.balance > 0 ? 'var(--success-green)' : (p.balance < 0 ? 'var(--primary-red)' : 'var(--text-dark)');
+                ptBody.innerHTML += `<tr><td><strong>${p.name}</strong> <br><small style="color:var(--text-gray)"><i class="fa-solid fa-phone"></i> ${p.phone || 'N/A'}</small></td><td style="color:${color}; font-weight:600;">₹${Math.abs(p.balance).toFixed(2)} ${p.balance>0?'(Recv)':'(Pay)'}</td></tr>`;
+                
+                if(p.balance > 0) receive += p.balance;
+                if(p.balance < 0) pay += Math.abs(p.balance);
+            }
+            document.getElementById('dash-receive').innerText = receive.toFixed(2);
+            document.getElementById('dash-pay').innerText = pay.toFixed(2);
+        });
 
+        db.ref(`users/${uid}/items`).on('value', snap => {
+            itemsData = snap.val() || {};
+            let itBody = document.getElementById('item-table-body');
+            itBody.innerHTML = ''; 
+            
+            let stockVal = 0, lowStock = 0;
+            for(let key in itemsData) {
+                let i = itemsData[key];
+                itBody.innerHTML += `<tr><td><strong>${i.name}</strong></td><td>${i.stock}</td><td>₹${i.purchasePrice}</td><td>₹${i.salePrice}</td></tr>`;
+                stockVal += (i.stock * i.purchasePrice);
+                if(i.stock <= 5) lowStock++;
+            }
+            document.getElementById('dash-stock-value').innerText = stockVal.toFixed(2);
+            document.getElementById('dash-low-stock').innerText = lowStock;
+        });
+
+        db.ref(`users/${uid}/sales`).on('value', snap => {
+            let sales = snap.val() || {};
+            let totalAmt = 0, cashIn = 0;
+            for(let key in sales) { totalAmt += sales[key].total; cashIn += sales[key].received; }
+            document.getElementById('dash-total-sale').innerText = totalAmt.toFixed(2);
+            document.getElementById('dash-cash').innerText = cashIn.toFixed(2);
+        });
+    }
+
+    // --- MASTERS LOGIC ---
+    function saveParty() {
+        const name = document.getElementById('partyName').value.trim(), phone = document.getElementById('partyPhone').value.trim();
+        const address = document.getElementById('partyAddress').value.trim();
+        let bal = parseFloat(document.getElementById('partyBalance').value) || 0;
+        if(!name) return showToast("Party Name required", "error");
+        if(document.getElementById('balanceType').value === 'pay') bal = -Math.abs(bal); 
+
+        const key = "PRT_" + Date.now();
+        db.ref(`users/${uid}/parties/${key}`).set({ name, phone, address, balance: bal }).then(()=>{
+            showToast("Party Profile Created!");
+            ['partyName','partyPhone','partyAddress'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('partyBalance').value = '0';
+        });
+    }
+
+    function saveItem() {
+        const name = document.getElementById('itemName').value.trim(), stock = parseInt(document.getElementById('itemStock').value) || 0;
+        const pPrice = parseFloat(document.getElementById('itemPurchase').value) || 0, sPrice = parseFloat(document.getElementById('itemSale').value) || 0;
+        if(!name) return showToast("Item Name required", "error");
+
+        const key = "ITM_" + Date.now();
+        db.ref(`users/${uid}/items/${key}`).set({ name, stock, purchasePrice: pPrice, salePrice: sPrice }).then(()=>{
+            showToast("Inventory Updated!");
+            ['itemName','itemPurchase','itemSale'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('itemStock').value = '0';
+        });
+    }
+
+    // --- AUTOCOMPLETE SEARCH LOGIC ---
+    // Hide lists when clicking outside
+    document.addEventListener('click', e => {
+        if(!e.target.closest('.search-wrapper')) {
+            document.querySelectorAll('.search-list').forEach(l => l.classList.remove('show'));
+        }
+    });
+
+    function filterParties(type) {
+        const input = document.getElementById(`${type==='sale'?'sale':'pur'}PartySearch`);
+        const list = document.getElementById(`${type==='sale'?'sale':'pur'}PartyList`);
+        const query = input.value.toLowerCase().trim();
+        
+        // Reset hidden ID if user is typing new name
+        document.getElementById(`${type==='sale'?'sale':'pur'}PartyId`).value = "";
+
+        list.innerHTML = '';
+        if(query.length < 1) { list.classList.remove('show'); return; }
+
+        let count = 0;
+        for(let key in partiesData) {
+            let p = partiesData[key];
+            if(p.name.toLowerCase().includes(query) || (p.phone && p.phone.includes(query))) {
+                list.innerHTML += `<div class="search-item" onclick="selectParty('${key}', '${p.name}', '${p.phone || ''}', '${type}')">
+                    <span><strong>${p.name}</strong> <small style="color:var(--text-gray);margin-left:5px;">${p.phone||''}</small></span>
+                    <span style="color:${p.balance>0?'var(--success-green)':'var(--primary-red)'}">₹${Math.abs(p.balance)}</span>
+                </div>`;
+                count++;
+            }
+        }
+        if(count > 0) list.classList.add('show'); else list.classList.remove('show');
+    }
+
+    function selectParty(id, name, phone, type) {
+        const prefix = type==='sale' ? 'sale' : 'pur';
+        document.getElementById(`${prefix}PartyId`).value = id;
+        document.getElementById(`${prefix}PartySearch`).value = name;
+        document.getElementById(`${prefix}PartyPhone`).value = phone;
+        document.getElementById(`${prefix}PartyList`).classList.remove('show');
+    }
+
+    function filterItems(type) {
+        const input = document.getElementById(`${type==='sale'?'sale':'pur'}ItemSearch`);
+        const list = document.getElementById(`${type==='sale'?'sale':'pur'}ItemList`);
+        const query = input.value.toLowerCase().trim();
+
+        list.innerHTML = '';
+        if(query.length < 1) { list.classList.remove('show'); return; }
+
+        let count = 0;
+        for(let key in itemsData) {
+            let i = itemsData[key];
+            if(i.name.toLowerCase().includes(query)) {
+                let price = type==='sale' ? i.salePrice : i.purchasePrice;
+                list.innerHTML += `<div class="search-item" onclick="selectItem('${key}', '${i.name}', ${price}, '${type}')">
+                    <span><strong>${i.name}</strong> <small style="color:var(--text-gray);margin-left:5px;">Stock: ${i.stock}</small></span>
+                    <span>₹${price}</span>
+                </div>`;
+                count++;
+            }
+        }
+        if(count > 0) list.classList.add('show'); else list.classList.remove('show');
+    }
+
+    function selectItem(id, name, price, type) {
+        const prefix = type==='sale' ? 'sale' : 'pur';
+        document.getElementById(`${prefix}ItemId`).value = id;
+        document.getElementById(`${prefix}ItemSearch`).value = name;
+        document.getElementById(`${prefix}ItemPrice`).value = price;
+        document.getElementById(`${prefix}ItemTotal`).innerText = `₹${price}`;
+        document.getElementById(`${prefix}ItemList`).classList.remove('show');
+    }
+
+    // Auto-calc amount row
+    ['sale', 'purchase'].forEach(t => {
+        let prefix = t==='sale'?'sale':'pur';
+        document.getElementById(`${prefix}ItemQty`).addEventListener('keyup', calcRow);
+        document.getElementById(`${prefix}ItemPrice`).addEventListener('keyup', calcRow);
+        function calcRow() {
+            let q = parseInt(document.getElementById(`${prefix}ItemQty`).value)||0;
+            let p = parseFloat(document.getElementById(`${prefix}ItemPrice`).value)||0;
+            document.getElementById(`${prefix}ItemTotal`).innerText = `₹${q*p}`;
+        }
+    });
+
+    // --- BILLING LOGIC (SALE & PURCHASE) ---
+    function toggleFullPay(type) {
+        const isSale = type === 'sale';
+        const isChecked = document.getElementById(`${isSale?'sale':'pur'}FullPaid`).checked;
+        const total = parseInt(document.getElementById(`${isSale?'pos':'pur'}-total`).innerText);
+        const inputField = document.getElementById(isSale?'posReceived':'purPaid');
+        
+        if(isChecked) { inputField.value = total; inputField.setAttribute('readonly', true); } 
+        else { inputField.removeAttribute('readonly'); }
+        calcBalance(type);
+    }
+
+    function calcBalance(type) {
+        const isSale = type === 'sale';
+        const total = parseInt(document.getElementById(`${isSale?'pos':'pur'}-total`).innerText) || 0;
+        const paid = parseInt(document.getElementById(isSale?'posReceived':'purPaid').value) || 0;
+        const diff = total - paid;
+        
+        const balLabel = document.getElementById(`${isSale?'sale':'pur'}BalanceDue`);
+        balLabel.innerText = `Balance Due: ₹${diff}`;
+        balLabel.className = diff > 0 ? 'bal-red' : 'bal-green';
+        balLabel.style.color = diff > 0 ? 'var(--primary-red)' : 'var(--success-green)';
+    }
+
+    function addPosItem(type) {
+        const isSale = type === 'sale';
+        const prefix = isSale ? 'sale' : 'pur';
+        
+        const key = document.getElementById(`${prefix}ItemId`).value;
+        const name = document.getElementById(`${prefix}ItemSearch`).value;
+        const qty = parseInt(document.getElementById(`${prefix}ItemQty`).value);
+        const price = parseFloat(document.getElementById(`${prefix}ItemPrice`).value);
+        
+        if(!key || !qty || !price) return showToast("Search & select item properly", "error");
+        if(isSale && itemsData[key].stock < qty) return showToast(`Low Stock! Only ${itemsData[key].stock} left.`, "error");
+
+        let targetCart = isSale ? saleCart : purchaseCart;
+        targetCart.push({ key, name: name, qty, price, total: qty*price });
+        updateCart(type);
+        
+        document.getElementById(`${prefix}ItemId`).value = ''; document.getElementById(`${prefix}ItemSearch`).value = '';
+        document.getElementById(`${prefix}ItemPrice`).value = ''; document.getElementById(`${prefix}ItemTotal`).innerText = '₹0';
+        document.getElementById(`${prefix}ItemQty`).value = '1';
+    }
+
+    function updateCart(type) {
+        const isSale = type === 'sale';
+        const cartArr = isSale ? saleCart : purchaseCart;
+        const c = document.getElementById(isSale ? 'sale-cart-container' : 'pur-cart-container');
+        let t = 0;
+        
+        if(cartArr.length===0){ 
+            c.innerHTML = '<div style="padding:20px; text-align:center; color:var(--text-gray); font-size:13px; background:#fff;">Add items to create invoice</div>'; 
+            document.getElementById(isSale ? 'pos-total' : 'pur-total').innerText="0"; 
+            calcBalance(type); return; 
+        }
+        
+        c.innerHTML = '';
+        cartArr.forEach((i, idx) => {
+            t += i.total;
+            c.innerHTML += `<div class="invoice-row" style="background:#fff;">
+                <div><strong>${i.name}</strong></div><div>${i.qty}</div><div>₹${i.price}</div><div style="font-weight:600;">₹${i.total}</div>
+                <div><i class="fa-solid fa-trash" style="color:var(--primary-red); cursor:pointer;" onclick="${isSale?'saleCart':'purchaseCart'}.splice(${idx},1);updateCart('${type}')"></i></div>
+            </div>`;
+        });
+        document.getElementById(isSale ? 'pos-total' : 'pur-total').innerText = t;
+        if(document.getElementById(`${isSale?'sale':'pur'}FullPaid`).checked) document.getElementById(isSale?'posReceived':'purPaid').value = t;
+        calcBalance(type);
+    }
+
+    // --- CHECKOUT WITH DYNAMIC PARTY CREATION ---
+    async function checkout(type) {
+        const isSale = type === 'sale';
+        const prefix = isSale ? 'sale' : 'pur';
+        const cartArr = isSale ? saleCart : purchaseCart;
+        
+        if(cartArr.length === 0) return showToast("Invoice is empty", "error");
+        
+        let partyId = document.getElementById(`${prefix}PartyId`).value;
+        let partyNameInput = document.getElementById(`${prefix}PartySearch`).value.trim();
+        let partyPhoneInput = document.getElementById(`${prefix}PartyPhone`).value.trim();
+        
+        const total = parseInt(document.getElementById(`${isSale?'pos':'pur'}-total`).innerText);
+        const paid = parseInt(document.getElementById(isSale?'posReceived':'purPaid').value) || 0;
+        const billId = (isSale?"INV_":"PUR_") + Date.now();
+        
+        try {
+            // DYNAMIC PARTY CREATION: Agar ID nahi hai, par naam likha hai, to nayi party bana do!
+            if(!partyId && partyNameInput !== "") {
+                partyId = "PRT_" + Date.now();
+                await db.ref(`users/${uid}/parties/${partyId}`).set({ name: partyNameInput, phone: partyPhoneInput, balance: 0, type: "auto" });
+                showToast(`New party '${partyNameInput}' created automatically`, 'success');
+            }
+
+            // 1. Save Bill
+            const billData = { partyId, partyName: partyNameInput || "Cash", total, paid, items: cartArr, date: new Date().toISOString() };
+            if(isSale) await db.ref(`users/${uid}/sales/${billId}`).set(billData);
+            else await db.ref(`users/${uid}/purchases/${billId}`).set(billData);
+            
+            // 2. Update Stock
+            for(let i of cartArr) {
+                let newStock = isSale ? (itemsData[i.key].stock - i.qty) : (itemsData[i.key].stock + i.qty);
+                await db.ref(`users/${uid}/items/${i.key}`).update({ stock: newStock });
+            }
+
+            // 3. Update Ledger (if party selected/created)
+            if(partyId) {
+                // Fetch latest balance inside transaction to be safe
+                const snap = await db.ref(`users/${uid}/parties/${partyId}`).once('value');
+                let currentBal = snap.exists() ? snap.val().balance : 0;
+                let udhaar = total - paid; 
+                let newBal = isSale ? (currentBal + udhaar) : (currentBal - udhaar); // Sale increases receivable(+), Purchase decreases(-)
+                await db.ref(`users/${uid}/parties/${partyId}`).update({ balance: newBal });
+            }
+
+            // Reset Form
+            if(isSale) saleCart = []; else purchaseCart = [];
+            updateCart(type); 
+            document.getElementById(`${prefix}PartyId`).value=''; document.getElementById(`${prefix}PartySearch`).value=''; document.getElementById(`${prefix}PartyPhone`).value='';
+            document.getElementById(`${prefix}FullPaid`).checked = false; document.getElementById(isSale?'posReceived':'purPaid').removeAttribute('readonly');
+            document.getElementById(isSale?'posReceived':'purPaid').value = '0';
+            
+            showToast(`${isSale?'Sale Invoice':'Purchase Bill'} Generated!`);
+
+            // WhatsApp formatting (Only for Sale)
+            if(isSale && partyPhoneInput) {
+                let msg = `🧾 *${(partyNameInput||"CASH CUSTOMER").toUpperCase()} - TAX INVOICE*\nInv No: ${billId}\n\n`;
+                cartArr.forEach(i => { msg += `▪ ${i.name} (${i.qty}) = Rs.${i.total}\n`; });
+                msg += `\n*Total Amount: Rs.${total}*\n*Amount Paid: Rs.${paid}*\n`;
+                if(total-paid > 0) msg += `*Balance Due: Rs.${total-paid}*\n`;
+                msg += `\nThank you for your business!`;
+                
+                if(partyPhoneInput.length === 10) partyPhoneInput = "91" + partyPhoneInput; 
+                setTimeout(() => window.open(`https://wa.me/${partyPhoneInput}?text=${encodeURIComponent(msg)}`, '_blank'), 1000);
+            }
+
+        } catch(e) { showToast(e.message, "error"); }
+    }
 </script>
 </body>
 </html>
