@@ -28,19 +28,18 @@
         .active { display: flex; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Login Box Styles */
         #pg-auth { justify-content: center; align-items: center; }
         .auth-box { background: var(--bg-panel); padding: 30px; border-radius: 12px; border: 1px solid var(--border); width: 90%; max-width: 400px; text-align: center; }
         .auth-box h2 { color: var(--primary); margin-bottom: 20px; }
+        
         input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; outline: none; }
-        input:focus { border-color: var(--primary); }
-        button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-bottom: 10px; }
-        button:hover { opacity: 0.9; }
-
-        /* Dashboard Basic Layout */
+        
+        .btn-primary { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
+        .btn-google { width: 100%; padding: 12px; background: #fff; color: #000; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
         #pg-dash { flex-direction: column; }
         .header { background: var(--bg-panel); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .logout-btn { background: #ef4444; width: auto; padding: 8px 15px; margin: 0; }
+        .logout-btn { background: #ef4444; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; }
         .content { padding: 20px; text-align: center; margin-top: 50px; }
     </style>
 </head>
@@ -49,29 +48,36 @@
     <div id="pg-auth" class="page active">
         <div class="auth-box">
             <h2>📦 SmartShop ERP</h2>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Admin Login</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Admin Panel Access</p>
             
-            <input type="email" id="email" placeholder="Admin Email">
+            <input type="email" id="email" placeholder="Email Address">
             <input type="password" id="pass" placeholder="Password">
             
-            <button onclick="login()">LOGIN</button>
-            <p id="auth-error" style="color: #ef4444; font-size: 12px; margin-top: 10px; display: none;"></p>
+            <button class="btn-primary" onclick="login()">LOGIN / REGISTER</button>
+            
+            <div style="margin: 15px 0; color: var(--text-muted); font-size: 12px;">OR</div>
+            
+            <button class="btn-google" onclick="loginGoogle()">
+                <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" width="20">
+                SIGN IN WITH GOOGLE
+            </button>
+            
+            <p id="auth-error" style="color: #ef4444; font-size: 12px; margin-top: 15px; display: none;"></p>
         </div>
     </div>
 
     <div id="pg-dash" class="page">
         <div class="header">
-            <h3>📦 SmartShop</h3>
+            <h3>📦 SmartShop Dashboard</h3>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
         <div class="content">
             <h2 id="welcome-text">Welcome back!</h2>
-            <p style="color: var(--text-muted); margin-top: 10px;">Login setup successful. Ab yahan papa ki shop ka inventory system add karenge.</p>
+            <p style="color: var(--text-muted); margin-top: 10px;">Aapka professional ERP setup ready ho raha hai.</p>
         </div>
     </div>
 
 <script>
-    // Tumhara exact Firebase Config
     const firebaseConfig = {
         apiKey: "AIzaSyAi7jxnVYFKbCc2baS3EQCIE_cTeMt9h34",
         authDomain: "smartshop-erp.firebaseapp.com",
@@ -83,64 +89,62 @@
         databaseURL: "https://smartshop-erp-default-rtdb.firebaseio.com" 
     };
 
-    // Initialize Firebase
     if (!firebase.apps.length) {
         firebase.initializeApp(firebaseConfig);
     }
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Page Switcher
     function switchPage(pageId) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
     }
 
-    // Check if user is already logged in
     auth.onAuthStateChanged(user => {
         if (user) {
-            document.getElementById('welcome-text').innerText = `Welcome, ${user.email}`;
+            document.getElementById('welcome-text').innerText = `Welcome, ${user.displayName || user.email}`;
             switchPage('pg-dash');
         } else {
             switchPage('pg-auth');
         }
     });
 
-    // Login Function
+    // Manual Email/Pass Login + Auto Register
     function login() {
         const e = document.getElementById('email').value.trim();
         const p = document.getElementById('pass').value;
         const errBox = document.getElementById('auth-error');
-        
         errBox.style.display = 'none';
-        
+
         if(!e || !p) {
-            errBox.innerText = "Email aur password khali nahi ho sakte!";
+            errBox.innerText = "Email aur password fill karein!";
             errBox.style.display = 'block';
             return;
         }
 
-        auth.signInWithEmailAndPassword(e, p)
-            .catch(err => {
-                // Pehli baar setup karne ke liye automatic user create
-                if (err.code === 'auth/user-not-found') {
-                    auth.createUserWithEmailAndPassword(e, p)
-                        .then(() => alert("New Admin Account Created!"))
-                        .catch(createErr => {
-                            errBox.innerText = createErr.message;
-                            errBox.style.display = 'block';
-                        });
-                } else {
-                    errBox.innerText = err.message;
+        auth.signInWithEmailAndPassword(e, p).catch(err => {
+            if (err.code === 'auth/user-not-found') {
+                auth.createUserWithEmailAndPassword(e, p).catch(cErr => {
+                    errBox.innerText = cErr.message;
                     errBox.style.display = 'block';
-                }
-            });
+                });
+            } else {
+                errBox.innerText = err.message;
+                errBox.style.display = 'block';
+            }
+        });
     }
 
-    // Logout Function
-    function logout() {
-        auth.signOut();
+    // Google Login Logic
+    function loginGoogle() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider).catch(err => {
+            document.getElementById('auth-error').innerText = err.message;
+            document.getElementById('auth-error').style.display = 'block';
+        });
     }
+
+    function logout() { auth.signOut(); }
 </script>
 </body>
 </html>
